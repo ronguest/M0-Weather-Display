@@ -23,6 +23,7 @@
 #include "ArialRoundedMTBold_14.h"
 #include "ArialRoundedMTBold_36.h"
 
+// Configure TFT pins
 #define STMPE_CS 6
 #define TFT_CS   9
 #define TFT_DC   10
@@ -55,11 +56,9 @@ Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
 // Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
 //Adafruit_WINC1500 WiFi;
 
-// Initialize the Wifi client library
 Adafruit_WINC1500Client client;
 
 int keyIndex = 0;                // your network key Index number (needed only for WEP)
-
 int status = WL_IDLE_STATUS;
 
 // NTP Servers:
@@ -94,7 +93,6 @@ const int UPDATE_INTERVAL_SECS = 10 * 60;  // Update Conditions every 10 minutes
 
 // TimeClient settings
 const float UTC_OFFSET = -5;
-
 int currentHour;
 int currentDay;
 int currentMinute;
@@ -103,14 +101,4 @@ int currentMinute;
 const boolean IS_METRIC = false;
 const String WUNDERGRROUND_LANGUAGE = "EN";
 
-//Thingspeak Settings
-//const String THINGSPEAK_CHANNEL_ID = "67284";
-//const String THINGSPEAK_API_READ_KEY = "L2VIW20QVNZJBLAK";
-
-// List, so that the downloader knows what to fetch
-//const String wundergroundIcons [] PROGMEM = {"chanceflurries","chancerain","chancesleet","chancesnow","clear","cloudy","flurries","fog","hazy","mostlycloudy","mostlysunny","partlycloudy","partlysunny","rain","sleet","snow","sunny","tstorms","unknown"};
-
 boolean showForecastText = false;
-/***************************
- * End Settings
- **************************/

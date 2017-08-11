@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
+//  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
 //  Portions Copyright (c) 2015 by Daniel Eichhorn
 
 #include "settings.h"
