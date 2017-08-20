@@ -33,6 +33,7 @@ time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
 
 long lastDownloadUpdate = millis();
+
 void setup(void) {
   time_t ntpTime;
   Serial.begin(115200);
@@ -97,8 +98,8 @@ void setup(void) {
 }
 
 void loop() {
-  int currentMinute;
-  int thisHour;
+  //int currentMinute;
+  //int thisHour;
 
   // Check if we should update weather information
   if (millis() - lastDownloadUpdate > 1000 * UPDATE_INTERVAL_SECS) {
