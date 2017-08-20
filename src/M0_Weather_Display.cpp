@@ -1,11 +1,15 @@
 //
 //  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
 //  Portions Copyright (c) 2015 by Daniel Eichhorn
-
+#include <Arduino.h>
 #include "settings.h"
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
+
+AdafruitIO_WiFi io(IO_USERNAME, IO_KEY, ssid, pass);
+AdafruitIO_Feed *statusFeed = io.feed("m0-wx-status");
+AdafruitIO_Feed *errorFeed = io.feed("m0-wx-error");
 
 GfxUi ui = GfxUi(&tft);
 
@@ -31,6 +35,7 @@ void drawSeparator(uint16_t y);
 void sleepNow(int wakeup);
 time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
+void uploadError(String, String);
 
 long lastDownloadUpdate = millis();
 
@@ -39,10 +44,13 @@ void setup(void) {
   Serial.begin(115200);
   delay(1000);
 
-  #ifdef WINC_EN
+  // Required when using WiFi101.h
+  WiFi.setPins(8,7,4,2);
+
+/*  #ifdef WINC_EN
     pinMode(WINC_EN, OUTPUT);
     digitalWrite(WINC_EN, HIGH);
-  #endif
+  #endif*/
 
   Serial.println("FeatherWing TFT");
   if (!ts.begin()) {
@@ -75,6 +83,9 @@ void setup(void) {
     delay(5000);
   }
 
+  /*Serial.print("Connecting to Adafruit IO");
+  io.connect();*/
+
   Serial.print("Initializing SD card...");
   if (!SD.begin(SD_CS)) {
     Serial.println("SD failed!");
@@ -95,6 +106,7 @@ void setup(void) {
   currentHour = -1;
 
   updateData();
+  //statusFeed->save("Starting loop()");
 }
 
 void loop() {
@@ -145,7 +157,7 @@ void updateData() {
   }
   //lastUpdate = timeClient.getFormattedTime();
   //readyForWeatherUpdate = false;
-
+  statusFeed->save("Finished updateData");
   showOverview();
 }
 
@@ -379,3 +391,10 @@ void sendNTPpacket(IPAddress &address) {
   result = Udp.write(packetBuffer, NTP_PACKET_SIZE);
   result = Udp.endPacket();
 }
+
+/*void uploadError(String s1, String s2) {
+  errorFeed->save(s1);
+  if (s2 != NULL) {
+    errorFeed->save(s2);
+  }
+}*/

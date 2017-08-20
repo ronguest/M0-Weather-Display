@@ -1,18 +1,19 @@
 //
 //  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
 
-#include <Arduino.h>
 #include <SPI.h>
+#include <WiFi101.h>
+#include <WiFiUdp.h>
 #include <Wire.h>      // this is needed even tho we aren't using it
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
-#include <Adafruit_WINC1500.h>
-#include <Adafruit_WINC1500Udp.h>
 #include <TimeLib.h>
 #include <Timezone.h>
+#include "AdafruitIO.h"
+#include "AdafruitIO_WiFi.h"
 #include "credentials.h"
 #include "WundergroundClient.h"
 
@@ -51,12 +52,12 @@
 //   https://www.arduino.cc/en/Reference/SPI
 
 // Setup the WINC1500 connection with the pins above and the default hardware SPI.
-Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
+//Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
 
 // Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
 //Adafruit_WINC1500 WiFi;
 
-Adafruit_WINC1500Client client;
+WiFiClient client;
 
 int keyIndex = 0;                // your network key Index number (needed only for WEP)
 int status = WL_IDLE_STATUS;
@@ -77,7 +78,7 @@ Timezone usCT(usCDT, usCST);
 TimeChangeRule *tcr;        //pointer to the time change rule, use to get the TZ abbrev
 time_t local;
 
-Adafruit_WINC1500UDP Udp;
+WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 time_t getNtpTime();
 void sendNTPpacket(IPAddress &address);

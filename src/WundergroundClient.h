@@ -25,6 +25,7 @@ See more at http://blog.squix.ch
 
 #pragma once
 
+#include <WiFi101.h>
 #include <JsonListener.h>
 #include <JsonStreamingParser.h>
 

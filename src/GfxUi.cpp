@@ -20,6 +20,8 @@ See more at http://blog.squix.ch
 
 #include "GfxUi.h"
 
+void uploadError(String, String);
+
 GfxUi::GfxUi(Adafruit_ILI9341 *tft) {
   _tft = tft;
 }
@@ -110,6 +112,7 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
   // Open requested file on SD card
   if ((bmpFile = SD.open(filename)) == NULL) {
     Serial.print(F("File not found"));
+    //uploadError("Icon file not found:", filename);
     return;
   }
 
