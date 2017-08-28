@@ -23,6 +23,9 @@
 #include "ArialRoundedMTBold_14.h"
 #include "ArialRoundedMTBold_36.h"
 
+// Red LED output on the M0 Feather
+const int ledPin = 13;
+
 // Configure TFT pins
 #define STMPE_CS 6
 #define TFT_CS   9
@@ -56,7 +59,7 @@ Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
 // Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
 //Adafruit_WINC1500 WiFi;
 
-Adafruit_WINC1500Client client;
+//Adafruit_WINC1500Client client;
 
 int keyIndex = 0;                // your network key Index number (needed only for WEP)
 int status = WL_IDLE_STATUS;

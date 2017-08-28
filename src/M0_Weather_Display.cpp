@@ -43,6 +43,8 @@ void setup(void) {
     pinMode(WINC_EN, OUTPUT);
     digitalWrite(WINC_EN, HIGH);
   #endif
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, LOW);
 
   Serial.println("FeatherWing TFT");
   if (!ts.begin()) {

@@ -78,6 +78,10 @@ void WundergroundClient::doUpdate(String url) {
   Adafruit_WINC1500Client client;
   const int httpPort = 80;
   const char* server = "api.wunderground.com";
+  // Red LED output on the M0 Feather
+  const int ledPin = 13;
+
+  digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
   if (!client.connect(server, httpPort)) {
     Serial.println("connection failed");
     return;
@@ -120,6 +124,7 @@ void WundergroundClient::doUpdate(String url) {
     }
   }
   Serial.print(F("isBody = "));Serial.println(isBody);
+  digitalWrite(ledPin, LOW);
 }
 
 void WundergroundClient::whitespace(char c) {
