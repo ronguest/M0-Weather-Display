@@ -32,7 +32,7 @@ void sleepNow(int wakeup);
 time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
 
-long lastDownloadUpdate = millis();
+long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
 
 void setup(void) {
   time_t ntpTime;
@@ -102,7 +102,7 @@ void loop() {
   //int thisHour;
 
   // Check if we should update weather information
-  if (millis() - lastDownloadUpdate > 1000 * UPDATE_INTERVAL_SECS) {
+  if ((millis() - lastDownloadUpdate) > (1000 * UPDATE_INTERVAL_SECS)) {
     // Always display overview after an update
     showForecastText = false;
     updateData();
