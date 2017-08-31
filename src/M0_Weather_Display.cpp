@@ -31,6 +31,7 @@ void drawSeparator(uint16_t y);
 void sleepNow(int wakeup);
 time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
+void logMessage(String);
 
 long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
 
@@ -52,6 +53,7 @@ void setup(void) {
     while (1);
   }
   Serial.println("Touchscreen started");
+  if (debug) Serial.println("Debug mode is ON");
 
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
@@ -134,11 +136,14 @@ void updateData() {
   thisHour = hour(local);
 
   wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+  if (wunderground.errorMessage.length() > 1) logMessage(wunderground.errorMessage);
   // We only update the Forecast and Astronomy once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
     wunderground.updateForecast(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+    if (wunderground.errorMessage.length() > 1) logMessage(wunderground.errorMessage);
     wunderground.updateAstronomy(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+    if (wunderground.errorMessage.length() > 1) logMessage(wunderground.errorMessage);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {
@@ -380,4 +385,26 @@ void sendNTPpacket(IPAddress &address) {
   result = Udp.beginPacket(address, 123); //NTP requests are to port 123
   result = Udp.write(packetBuffer, NTP_PACKET_SIZE);
   result = Udp.endPacket();
+}
+
+void logMessage(String s) {
+  // Write string to SD card file
+  File myFile;
+  if (!debug) return;
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  myFile = SD.open("debug.txt", FILE_WRITE);
+
+  // if the file opened okay, write to it:
+  if (myFile) {
+    Serial.print("Writing to debug.txt...");
+    myFile.println(s);
+    // close the file:
+    myFile.close();
+    Serial.println("done.");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening debug.txt");
+  }
+
 }

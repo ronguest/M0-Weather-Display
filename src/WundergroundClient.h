@@ -80,6 +80,8 @@ class WundergroundClient: public JsonListener {
     void updateForecast(String apiKey, String language, String pws);
     void updateAstronomy(String apiKey, String language, String country, String city);
     void updateAstronomy(String apiKey, String language, String pws);
+    // RG added
+    String errorMessage;
     // JJG added
     String getHours();
     String getMinutes();

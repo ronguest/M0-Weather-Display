@@ -105,3 +105,4 @@ const boolean IS_METRIC = false;
 const String WUNDERGRROUND_LANGUAGE = "EN";
 
 boolean showForecastText = false;
+const boolean debug = true;

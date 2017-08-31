@@ -81,9 +81,11 @@ void WundergroundClient::doUpdate(String url) {
   // Red LED output on the M0 Feather
   const int ledPin = 13;
 
+  errorMessage = "";
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
   if (!client.connect(server, httpPort)) {
     Serial.println("connection failed");
+    errorMessage = "doUpdate: connection failed:" + url;
     return;
   }
 
@@ -101,6 +103,7 @@ void WundergroundClient::doUpdate(String url) {
     retryCounter++;
     if (retryCounter > 10) {
       Serial.println(F("Retry timed out"));
+      errorMessage = "doUpdate: retry timed out";
       return;
     }
   }
