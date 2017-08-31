@@ -98,6 +98,7 @@ void setup(void) {
 
   currentHour = -1;
 
+  logMessage("Starting initial updateData");
   updateData();
 }
 
