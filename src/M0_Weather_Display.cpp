@@ -398,14 +398,14 @@ void logMessage(String s) {
 
   // if the file opened okay, write to it:
   if (myFile) {
-    Serial.print("Writing to debug.txt...");
+    //Serial.print("Writing to debug.txt...");
     myFile.println(s);
     // close the file:
     myFile.close();
     Serial.println("done.");
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening debug.txt");
+    Serial.println("error opening debug.txt"); Serial.flush();
   }
 
 }

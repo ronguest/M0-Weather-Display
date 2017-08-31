@@ -84,13 +84,13 @@ void WundergroundClient::doUpdate(String url) {
   errorMessage = "";
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
   if (!client.connect(server, httpPort)) {
-    Serial.println("connection failed");
+    Serial.println("connection failed"); Serial.flush();
     errorMessage = "doUpdate: connection failed:" + url;
     return;
   }
 
   Serial.print("Requesting URL: ");
-  Serial.println(server + '/' + url);
+  Serial.println(server + '/' + url); Serial.flush();
 
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
@@ -102,7 +102,7 @@ void WundergroundClient::doUpdate(String url) {
     delay(1000);
     retryCounter++;
     if (retryCounter > 10) {
-      Serial.println(F("Retry timed out"));
+      Serial.println(F("Retry timed out")); Serial.flush();
       errorMessage = "doUpdate: retry timed out: " + url;
       return;
     }
@@ -126,7 +126,7 @@ void WundergroundClient::doUpdate(String url) {
       }
     }
   }
-  Serial.print(F("isBody = "));Serial.println(isBody);
+  Serial.print(F("isBody = "));Serial.println(isBody); Serial.flush();
   digitalWrite(ledPin, LOW);
 }
 
