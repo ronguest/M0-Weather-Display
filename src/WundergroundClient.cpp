@@ -103,7 +103,7 @@ void WundergroundClient::doUpdate(String url) {
     retryCounter++;
     if (retryCounter > 10) {
       Serial.println(F("Retry timed out"));
-      errorMessage = "doUpdate: retry timed out";
+      errorMessage = "doUpdate: retry timed out: " + url;
       return;
     }
   }
