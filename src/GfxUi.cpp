@@ -98,14 +98,14 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
 
   if((x >= _tft->width()) || (y >= _tft->height())) return;
 
-  Serial.println();
+  /*Serial.println();
   Serial.print("tft width=");Serial.println(_tft->width());
   Serial.print("tft height=");Serial.println(_tft->height());
     Serial.print("x=");Serial.println(x);
   Serial.print("y=");Serial.println(y);
   Serial.print(F("Loading image '"));
   Serial.print(filename);
-  Serial.println('\'');
+  Serial.println('\'');*/
 
   // Open requested file on SD card
   if ((bmpFile = SD.open(filename)) == NULL) {
@@ -118,7 +118,7 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
     Serial.print(F("File size: ")); Serial.println(read32(bmpFile));
     (void)read32(bmpFile); // Read & ignore creator bytes
     bmpImageoffset = read32(bmpFile); // Start of image data
-    Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
+    //Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
     // Read DIB header
     Serial.print(F("Header size: ")); Serial.println(read32(bmpFile));
     bmpWidth  = read32(bmpFile);
@@ -207,9 +207,9 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
         } // end scanline
         _tft->endWrite();
       }
-      Serial.print(F("Loaded in "));
-      Serial.print(millis() - startTime);
-      Serial.println(" ms");
+      //Serial.print(F("Loaded in "));
+      //Serial.print(millis() - startTime);
+      //Serial.println(" ms");
     } // end goodBmp
   }
 }

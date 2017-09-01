@@ -25,6 +25,9 @@ See more at http://blog.squix.ch
 
 #include <Adafruit_WINC1500.h>
 #include "WundergroundClient.h"
+
+File myFile;
+
 bool usePM = false; // Set to true if you want to use AM/PM time disaply
 bool isPM = false; // JJG added ///////////
 
@@ -83,11 +86,16 @@ void WundergroundClient::doUpdate(String url) {
 
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
   if (!client.connect(server, httpPort)) {
+    myFile = SD.open("debug.txt", FILE_WRITE);
+    if (myFile) {
+      myFile.print(F("Failed to connect to: "));Serial.println(url);
+      myFile.close();
+    }
     Serial.println("connection failed");
     return;
   }
 
-  Serial.print("Requesting URL: ");
+  Serial.print(F("Requesting URL: "));
   Serial.println(server + '/' + url);
 
   // This will send the request to the server
@@ -100,6 +108,11 @@ void WundergroundClient::doUpdate(String url) {
     delay(1000);
     retryCounter++;
     if (retryCounter > 10) {
+      myFile = SD.open("debug.txt", FILE_WRITE);
+      if (myFile) {
+        myFile.print(F("Retry timed out to: "));Serial.println(url);
+        myFile.close();
+      }
       Serial.println(F("Retry timed out"));
       return;
     }
@@ -123,7 +136,16 @@ void WundergroundClient::doUpdate(String url) {
       }
     }
   }
+  client.stop();          // We're done, shut down the connection
+
   Serial.print(F("isBody = "));Serial.println(isBody);
+  if (!isBody) {
+    myFile = SD.open("debug.txt", FILE_WRITE);
+    if (myFile) {
+      myFile.print("Was not isBody: ");Serial.println(url);
+      myFile.close();
+    }
+  }
   digitalWrite(ledPin, LOW);
 }
 
