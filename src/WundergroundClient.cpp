@@ -26,6 +26,8 @@ See more at http://blog.squix.ch
 #include <Adafruit_WINC1500.h>
 #include "WundergroundClient.h"
 
+extern "C" char *sbrk(int i);
+
 File myFile;
 
 bool usePM = false; // Set to true if you want to use AM/PM time disaply
@@ -95,13 +97,15 @@ void WundergroundClient::doUpdate(String url) {
     return;
   }
 
-  Serial.print(F("Requesting URL: "));
-  Serial.println(server + '/' + url);
+  Serial.print(F("Requesting URL: ")); Serial.println(server + '/' + url); Serial.flush();
 
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: api.wunderground.com\r\n" +
                "Connection: close\r\n\r\n");
+
+  char stack_dummy = 0;
+  Serial.print("memory remaining is: "); Serial.println(&stack_dummy - sbrk(0));
 
   int retryCounter = 0;
   while(!client.available()) {
@@ -142,7 +146,7 @@ void WundergroundClient::doUpdate(String url) {
   if (!isBody) {
     myFile = SD.open("debug.txt", FILE_WRITE);
     if (myFile) {
-      myFile.print("Was not isBody: ");Serial.println(url);
+      myFile.print("Was not isBody: ");myFile.println(url);
       myFile.close();
     }
   }
@@ -150,7 +154,7 @@ void WundergroundClient::doUpdate(String url) {
 }
 
 void WundergroundClient::whitespace(char c) {
-  Serial.println(F("whitespace"));
+  //Serial.println(F("whitespace"));
 }
 
 void WundergroundClient::startDocument() {
@@ -273,7 +277,7 @@ void WundergroundClient::value(String value) {
   }
   if (currentKey == "icon") {
     if (isForecast && !isSimpleForecast && currentForecastPeriod < MAX_FORECAST_PERIODS) {
-      Serial.println(String(currentForecastPeriod) + ": " + value + ":" + currentParent);
+      //Serial.println(String(currentForecastPeriod) + ": " + value + ":" + currentParent);
       forecastIcon[currentForecastPeriod] = value;
     }
     if (!isForecast) {
@@ -308,12 +312,12 @@ void WundergroundClient::value(String value) {
     currentForecastPeriod = value.toInt();
   }
   if (currentKey == "title" && currentForecastPeriod < MAX_FORECAST_PERIODS) {
-      Serial.println(String(currentForecastPeriod) + ": " + value);
+      //Serial.println(String(currentForecastPeriod) + ": " + value);
       forecastTitle[currentForecastPeriod] = value;
   }
 
   if (currentKey == "fcttext" && currentForecastPeriod < MAX_FORECAST_PERIODS) {
-      Serial.println(String(currentForecastPeriod) + ": " + value);
+      //Serial.println(String(currentForecastPeriod) + ": " + value);
       fcttext[currentForecastPeriod] = value;
   }
   // The detailed forecast period has only one forecast per day with low/high for both
@@ -332,7 +336,7 @@ void WundergroundClient::value(String value) {
   if (currentKey == "celsius" && isMetric && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
 
       if (currentParent == "high") {
-        Serial.println(String(currentForecastPeriod)+ ": " + value);
+        //Serial.println(String(currentForecastPeriod)+ ": " + value);
         forecastHighTemp[dailyForecastPeriod] = value;
       }
       if (currentParent == "low") {
