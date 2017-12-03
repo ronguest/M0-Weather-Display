@@ -286,11 +286,11 @@ void drawAstronomy() {
 
 // Helper function, should be part of the weather station library and should disappear soon
 String getMeteoconIcon(String iconText) {
-  if (iconText == "F") return "cflur";
-  if (iconText == "Q") return "crain";
-  if (iconText == "W") return "csleet";
-  if (iconText == "V") return "csnow";
-  if (iconText == "S") return "cstorms";
+  if (iconText == "F") return "flurries";
+  if (iconText == "Q") return "rain";
+  if (iconText == "W") return "sleet";
+  if (iconText == "V") return "snow";
+  if (iconText == "S") return "tstorms";
   if (iconText == "B") return "clear";
   if (iconText == "Y") return "cloudy";
   if (iconText == "F") return "flurries";
