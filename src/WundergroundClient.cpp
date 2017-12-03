@@ -37,6 +37,10 @@ WundergroundClient::WundergroundClient(boolean _isMetric) {
   isMetric = _isMetric;
 }
 
+// **********
+// Example URL for the 10 day forecast: http://api.wunderground.com/api/436da0958aa624c8/forecast10day/q/pws:KTXALLEN99.json
+// **********
+
 // For retrieving based on location
 void WundergroundClient::updateConditions(String apiKey, String language, String country, String city) {
   isForecast = false;

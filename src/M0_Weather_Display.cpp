@@ -285,6 +285,7 @@ void drawAstronomy() {
 }
 
 // Helper function, should be part of the weather station library and should disappear soon
+// I got the original bmp files from: http://www.squix.org/blog/wunderground/partlycloudy.bmp
 String getMeteoconIcon(String iconText) {
   if (iconText == "F") return "flurries";
   if (iconText == "Q") return "rain";
