@@ -6,6 +6,7 @@
 #include <Wire.h>      // this is needed even tho we aren't using it
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
+#include <Adafruit_HX8357.h>
 #include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
@@ -26,7 +27,7 @@
 // Red LED output on the M0 Feather
 const int ledPin = 13;
 
-// Configure TFT pins
+// Configure TFT pins - specific to M0
 #define STMPE_CS 6
 #define TFT_CS   9
 #define TFT_DC   10

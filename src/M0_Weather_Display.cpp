@@ -2,9 +2,16 @@
 //  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
 //  Portions Copyright (c) 2015 by Daniel Eichhorn
 
+#include "display.h"
 #include "settings.h"
 
+#ifdef HX8357
+#define TFT_RST -1
+Adafruit_HX8357 tft = Adafruit_HX8357(TFT_CS, TFT_DC, TFT_RST);
+#endif
+#ifdef ILI9341
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+#endif
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 GfxUi ui = GfxUi(&tft);
@@ -54,9 +61,9 @@ void setup(void) {
   Serial.println("Touchscreen started");
 
   tft.begin();
-  tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(CENTER);
   ui.drawString(120, 160, F("Connecting to WiFi"));
 
@@ -152,7 +159,7 @@ void updateData() {
 }
 
 void showOverview() {
-  tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
 
   //drawTime();
@@ -170,9 +177,9 @@ void showForecastDetail() {
   int period;
   int finalSpace;
 
-  tft.fillScreen(ILI9341_BLACK);
+  tft.fillScreen(WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
 
   // We show 4 periods which is 2 days + 2 nights
@@ -216,13 +223,13 @@ void drawCurrentWeather() {
 
   // Weather Text
   tft.setFont(&ArialRoundedMTBold_14);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   //ui.setTextSize(2);
   ui.drawString(220, 40, wunderground.getWeatherText());
 
   tft.setFont(&ArialRoundedMTBold_36);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
   if (IS_METRIC) {
@@ -244,7 +251,7 @@ void drawForecast() {
 
 // helper for the forecast columns
 void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextAlignment(CENTER);
   String day = wunderground.getForecastTitle(dayIndex).substring(0, 3);
@@ -252,7 +259,7 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.drawString(x + 45, y, day);
 
   tft.setFont(&ArialRoundedMTBold_36);
-  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  ui.setTextColor(WX_WHITE, WX_BLACK);
   ui.drawString(x + 40, y + 40, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
 
   String weatherIcon = getMeteoconIcon(wunderground.getForecastIcon(dayIndex));
@@ -266,19 +273,19 @@ void drawAstronomy() {
   int moonAgeImage = 24 * wunderground.getMoonAge().toInt() / 30.0;
   ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, 255);
 
-  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  ui.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextAlignment(LEFT);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.drawString(20, 270, "Sun");
-  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  ui.setTextColor(WX_WHITE, WX_BLACK);
   ui.drawString(20, 285, wunderground.getSunriseTime());
   ui.drawString(20, 300, wunderground.getSunsetTime());
 
   ui.setTextAlignment(RIGHT);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.drawString(220, 270, "Moon");
-  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  ui.setTextColor(WX_WHITE, WX_BLACK);
   ui.drawString(220, 285, wunderground.getMoonriseTime());
   ui.drawString(220, 300, wunderground.getMoonsetTime());
 
@@ -311,10 +318,10 @@ String getMeteoconIcon(String iconText) {
 // Progress bar helper
 void drawProgress(uint8_t percentage, String text) {
   ui.setTextAlignment(CENTER);
-  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
-  tft.fillRect(0, 140, 240, 45, ILI9341_BLACK);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
+  tft.fillRect(0, 140, 240, 45, WX_BLACK);
   ui.drawString(120, 160, text);
-  ui.drawProgressBar(10, 165, 240 - 20, 15, percentage, ILI9341_WHITE, ILI9341_BLUE);
+  ui.drawProgressBar(10, 165, 240 - 20, 15, percentage, WX_WHITE, WX_BLUE);
 }
 
 // if you want separators, uncomment the tft-line

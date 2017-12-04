@@ -18,9 +18,15 @@ SOFTWARE.
 See more at http://blog.squix.ch
 */
 
-#include <Adafruit_ILI9341.h>
+#include "display.h"
 //#include <FS.h>
 #include <SD.h>
+#ifdef HX8357
+#include <Adafruit_HX8357.h>
+#endif
+#ifdef ILI9341
+#include <Adafruit_ILI9341.h>
+#endif
 
 #ifndef _GFX_UI_H
 #define _GFX_UI_H
@@ -34,7 +40,12 @@ enum TextAlignment {
 
 class GfxUi {
   public:
+#ifdef HX8357
+    GfxUi(Adafruit_HX8357 * tft);
+#endif
+#ifdef ILI9341
     GfxUi(Adafruit_ILI9341 * tft);
+#endif
     void drawString(int x, int y, char *text);
     void drawString(int x, int y, String text);
     void setTextAlignment(TextAlignment alignment);
@@ -45,7 +56,12 @@ class GfxUi {
     void drawProgressBar(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t percentage, uint16_t frameColor, uint16_t barColor);
 
   private:
+  #ifdef HX8357
+  Adafruit_HX8357 * _tft;
+  #endif
+  #ifdef ILI9341
     Adafruit_ILI9341 * _tft;
+  #endif
     TextAlignment _alignment = LEFT;
     uint16_t _textColor;
     uint16_t _backgroundColor;
