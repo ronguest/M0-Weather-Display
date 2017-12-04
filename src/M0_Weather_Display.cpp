@@ -38,6 +38,7 @@ void drawSeparator(uint16_t y);
 void sleepNow(int wakeup);
 time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
+void todayDetail(int baseline);
 
 long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
 
@@ -61,6 +62,7 @@ void setup(void) {
   Serial.println("Touchscreen started");
 
   tft.begin();
+  tft.setRotation(2);
   tft.fillScreen(WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(WX_CYAN, WX_BLACK);
@@ -164,8 +166,46 @@ void showOverview() {
 
   drawTime();
   drawCurrentWeather();
-//  drawForecast();
-//  drawAstronomy();
+  todayDetail(160);
+  drawForecast();
+  drawAstronomy();
+}
+
+void todayDetail(int baseline) {
+  int textLength;
+  String text;
+  int maxPerLine = 38;
+  int maxLines = 4;
+  int finalSpace;
+  int lineSize = 20;
+  int startPoint = 0;   // Position in text of next character to print
+
+  tft.setFont(&ArialRoundedMTBold_14);
+  ui.setTextColor(WX_CYAN, WX_BLACK);
+  ui.setTextAlignment(LEFT);
+
+  int y = baseline;
+  text = wunderground.getForecastText(0);
+  textLength = text.length();
+  Serial.print("Today detail length: "); Serial.println(textLength);
+  while ((startPoint < textLength) && (maxLines > 0)){
+    // Find the last space in the next string we will print
+    finalSpace = text.lastIndexOf(' ', startPoint + maxPerLine);
+    if (finalSpace == -1 ) {
+      // It's possible the final substring doesn't have a space
+      finalSpace = textLength;
+    }
+    Serial.print("Final space: ");Serial.println(finalSpace);
+    // If the first character is a space, skip it (happens due to line wrapping)
+    if (text.indexOf(' ', startPoint) == startPoint) {
+      startPoint++;
+    }
+    ui.drawString(10, y, text.substring(startPoint, finalSpace));
+    y += lineSize;
+    startPoint = finalSpace;
+    Serial.print("Start point: ");Serial.println(startPoint);
+    maxLines--;
+  }
 }
 
 void showForecastDetail() {
@@ -173,7 +213,7 @@ void showForecastDetail() {
   String text;
   int y = 30;
   int lineSize = 20;
-  const int maxPerLine = 30;
+  const int maxPerLine = 38;
   int period;
   int finalSpace;
 
@@ -206,7 +246,7 @@ void showForecastDetail() {
       if (text.indexOf(' ', startPoint) == startPoint) {
         startPoint++;
       }
-      ui.drawString(0, y, text.substring(startPoint, finalSpace));
+      ui.drawString(10, y, text.substring(startPoint, finalSpace));
       y += lineSize;
       startPoint = finalSpace;
       Serial.print("Start point: ");Serial.println(startPoint);
@@ -246,7 +286,7 @@ void drawCurrentWeather() {
   // Weather Icon
   String weatherIcon = getMeteoconIcon(wunderground.getTodayIcon());
 //  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
-  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 40);
+  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
   // Weather Text
   tft.setFont(&ArialRoundedMTBold_14);
@@ -254,7 +294,7 @@ void drawCurrentWeather() {
   ui.setTextAlignment(RIGHT);
 //  ui.drawString(220, 40, wunderground.getWeatherText());
   //ui.drawString(220, 40, wunderground.getWeatherText());
-  ui.drawString(240, 70, wunderground.getWeatherText());
+  ui.drawString(240, 80, wunderground.getWeatherText());
 
   tft.setFont(&ArialRoundedMTBold_36);
   ui.setTextColor(WX_CYAN, WX_BLACK);
@@ -266,16 +306,18 @@ void drawCurrentWeather() {
   String temp = wunderground.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
-  ui.drawString(240, 110, temp);
+  ui.drawString(240, 120, temp);
   //drawSeparator(135);
 }
 
 // draws the three forecast columns
 void drawForecast() {
-  const int drop = 100;
-  drawForecastDetail(10, drop, 0);
-  drawForecastDetail(130, drop, 2);
-  //drawForecastDetail(180, drop, 4);
+  //const int drop = 140;
+  const int drop = 260;
+//  drawForecastDetail(10, drop, 0);
+//  drawForecastDetail(130, drop, 2);
+  drawForecastDetail(30, drop, 0);
+  drawForecastDetail(200, drop, 2);
   //drawSeparator(drop + 65 + 10);
 }
 
@@ -294,30 +336,33 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 
   String weatherIcon = getMeteoconIcon(wunderground.getForecastIcon(dayIndex));
   //ui.drawBmp("/Minis/" + weatherIcon + ".bmp", x, y + 15);
+  //ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
-
 }
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
   int moonAgeImage = 24 * wunderground.getMoonAge().toInt() / 30.0;
-  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, 255);
+  int baseline = 420;   // Place at the bottom
+  int baseX = 40;
+//  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
+  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline);
 
   ui.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextAlignment(LEFT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(20, 270, "Sun");
+  ui.drawString(baseX, baseline+15, "Sun");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(20, 285, wunderground.getSunriseTime());
-  ui.drawString(20, 300, wunderground.getSunsetTime());
+  ui.drawString(baseX, baseline+30, wunderground.getSunriseTime());
+  ui.drawString(baseX, baseline+45, wunderground.getSunsetTime());
 
   ui.setTextAlignment(RIGHT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(220, 270, "Moon");
+  ui.drawString(baseX+260, baseline+15, "Moon");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(220, 285, wunderground.getMoonriseTime());
-  ui.drawString(220, 300, wunderground.getMoonsetTime());
+  ui.drawString(baseX+260, baseline+30, wunderground.getMoonriseTime());
+  ui.drawString(baseX+260, baseline+45, wunderground.getMoonsetTime());
 
 }
 
