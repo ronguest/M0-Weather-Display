@@ -162,10 +162,10 @@ void showOverview() {
   tft.fillScreen(WX_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
 
-  //drawTime();
+  drawTime();
   drawCurrentWeather();
-  drawForecast();
-  drawAstronomy();
+//  drawForecast();
+//  drawAstronomy();
 }
 
 void showForecastDetail() {
@@ -215,18 +215,46 @@ void showForecastDetail() {
   }
 }
 
+// Draws date and time
+void drawTime() {
+  local = usCT.toLocal(now(), &tcr);
+  hours = hour(local);
+  minutes = minute(local);
+  dayOfWeek = weekday(local);
+
+  ui.setTextAlignment(CENTER);
+  ui.setTextColor(WX_WHITE, WX_BLACK);
+  tft.setFont(&ArialRoundedMTBold_14);
+
+  String dateS = String(dayStr(dayOfWeek)) + ", " + String(monthStr(month(local))) + " " + String(day(local));
+  ui.drawString(150, 20, dateS);
+
+  String ampm = "am";
+  //tft.setFont(&ArialRoundedMTBold_36);
+  if (hours > 12) {
+    hours -= 12;
+    ampm = "pm";
+  }
+  String timeS = String(hours) + ":" + String(minutes) + ampm;
+  //ui.drawString(120, 56, timeS);
+  ui.drawString(150, 40, timeS);
+  //drawSeparator(65);
+}
+
 // draws current weather information
 void drawCurrentWeather() {
   // Weather Icon
   String weatherIcon = getMeteoconIcon(wunderground.getTodayIcon());
-  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
+//  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
+  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 40);
 
   // Weather Text
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
-  //ui.setTextSize(2);
-  ui.drawString(220, 40, wunderground.getWeatherText());
+//  ui.drawString(220, 40, wunderground.getWeatherText());
+  //ui.drawString(220, 40, wunderground.getWeatherText());
+  ui.drawString(240, 70, wunderground.getWeatherText());
 
   tft.setFont(&ArialRoundedMTBold_36);
   ui.setTextColor(WX_CYAN, WX_BLACK);
@@ -236,8 +264,10 @@ void drawCurrentWeather() {
     degreeSign = "C";
   }
   String temp = wunderground.getCurrentTemp() + degreeSign;
-  ui.drawString(220, 70, temp);
-  drawSeparator(135);
+  //ui.drawString(220, 70, temp);
+//  ui.drawString(220, 70, temp);
+  ui.drawString(240, 110, temp);
+  //drawSeparator(135);
 }
 
 // draws the three forecast columns
@@ -246,7 +276,7 @@ void drawForecast() {
   drawForecastDetail(10, drop, 0);
   drawForecastDetail(130, drop, 2);
   //drawForecastDetail(180, drop, 4);
-  drawSeparator(drop + 65 + 10);
+  //drawSeparator(drop + 65 + 10);
 }
 
 // helper for the forecast columns

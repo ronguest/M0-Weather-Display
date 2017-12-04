@@ -80,6 +80,10 @@ TimeChangeRule usCST = {"CST", First, dowSunday, Nov, 2, -360};
 Timezone usCT(usCDT, usCST);
 TimeChangeRule *tcr;        //pointer to the time change rule, use to get the TZ abbrev
 time_t local;
+unsigned int hours = 0;                      // Track hours
+unsigned int minutes = 0;                    // Track minutes
+unsigned int seconds = 0;                    // Track seconds
+unsigned int dayOfWeek = 0;                  // Sunday == 1
 
 Adafruit_WINC1500UDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
