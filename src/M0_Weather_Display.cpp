@@ -105,7 +105,7 @@ void setup(void) {
 
   currentHour = -1;
 
-  updateData();
+  //updateData();
 }
 
 void loop() {
@@ -271,7 +271,7 @@ void drawTime() {
   String ampm = "am";
   //tft.setFont(&largeFont);
   if (hours >= 12) {
-    (hours > 12) ? hours - 12 : hours;
+    hours = (hours > 12) ? hours - 12 : hours;
     ampm = "pm";
   }
   String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
