@@ -18,16 +18,20 @@
 #include "WundergroundClient.h"
 
 #ifdef HX8357
-#include "Fonts/FreeSansBold18pt7b.h"    // Font from Adafruit Gfx library
+#include "Fonts/FreeSansBold9pt7b.h"    // Font from Adafruit Gfx library
 #include "ArialRoundedMTBold_36.h"    // Font created by http://oleddisplay.squix.ch/
-#define smallFont FreeSansBold18pt7b
+#define smallFont FreeSansBold9pt7b
 #define largeFont ArialRoundedMTBold_36
+const int maxPerLine = 34;    // Max chars that fit on line for text forecast info
+const int lineSize = 22;            // Vertical line space increment for forecast text
 #endif
 #ifdef ILI9341
 #include "ArialRoundedMTBold_14.h"    // Font created by http://oleddisplay.squix.ch/
 #include "ArialRoundedMTBold_36.h"    // Font created by http://oleddisplay.squix.ch/
 #define smallFont ArialRoundedMTBold_14
 #define largeFont ArialRoundedMTBold_36
+const int maxPerLine = 38;     // Max chars that fit on line for text forecast info
+const int lineSize = 20;            // Vertical line space increment for forecast text
 #endif
 
 // Additional UI functions

@@ -166,7 +166,7 @@ void showOverview() {
 
   drawTime();
   drawCurrentWeather();
-  todayDetail(160);
+  todayDetail(150);
   drawForecast();
   drawAstronomy();
 }
@@ -174,10 +174,8 @@ void showOverview() {
 void todayDetail(int baseline) {
   int textLength;
   String text;
-  int maxPerLine = 38;
   int maxLines = 4;
   int finalSpace;
-  int lineSize = 20;
   int startPoint = 0;   // Position in text of next character to print
 
   tft.setFont(&smallFont);
@@ -215,8 +213,6 @@ void showForecastDetail() {
   int textLength;
   String text;
   int y = 30;
-  int lineSize = 20;
-  const int maxPerLine = 38;
   int period;
   int finalSpace;
 
@@ -274,8 +270,8 @@ void drawTime() {
 
   String ampm = "am";
   //tft.setFont(&largeFont);
-  if (hours > 12) {
-    hours -= 12;
+  if (hours >= 12) {
+    (hours > 12) ? hours - 12 : hours;
     ampm = "pm";
   }
   String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
@@ -346,8 +342,8 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
   int moonAgeImage = 24 * wunderground.getMoonAge().toInt() / 30.0;
-  int baseline = 420;   // Place at the bottom
-  int baseX = 40;
+  int baseline = 410;   // Place at the bottom
+  int baseX = 20;
 //  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
   ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline);
 
@@ -355,17 +351,17 @@ void drawAstronomy() {
   tft.setFont(&smallFont);
   ui.setTextAlignment(LEFT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(baseX, baseline+15, "Sun");
+  ui.drawString(baseX, baseline+25, "Sun");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX, baseline+30, wunderground.getSunriseTime());
-  ui.drawString(baseX, baseline+45, wunderground.getSunsetTime());
+  ui.drawString(baseX, baseline+43, wunderground.getSunriseTime());
+  ui.drawString(baseX, baseline+60, wunderground.getSunsetTime());
 
   ui.setTextAlignment(RIGHT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(baseX+260, baseline+15, "Moon");
+  ui.drawString(baseX+280, baseline+25, "Moon");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX+260, baseline+30, wunderground.getMoonriseTime());
-  ui.drawString(baseX+260, baseline+45, wunderground.getMoonsetTime());
+  ui.drawString(baseX+280, baseline+43, wunderground.getMoonriseTime());
+  ui.drawString(baseX+280, baseline+60, wunderground.getMoonsetTime());
 
 }
 
