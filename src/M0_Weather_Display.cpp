@@ -183,9 +183,12 @@ void todayDetail(int baseline) {
   tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
+  local = usCT.toLocal(now(), &tcr);
+  hours = hour(local);
 
   int y = baseline;
-  text = wunderground.getForecastText(0);
+  // Starting at 5pm show the forecast for the evening/night instead of the daytime forecast
+  text = wunderground.getForecastText(hours >= 17 ? 1 : 0);   // Period 0 is daytime, period 1 is the night forecast
   textLength = text.length();
   Serial.print("Today detail length: "); Serial.println(textLength);
   while ((startPoint < textLength) && (maxLines > 0)){
