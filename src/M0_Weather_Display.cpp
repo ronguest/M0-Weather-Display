@@ -64,7 +64,7 @@ void setup(void) {
   tft.begin();
   tft.setRotation(2);
   tft.fillScreen(WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(CENTER);
   ui.drawString(120, 160, F("Connecting to WiFi"));
@@ -162,7 +162,7 @@ void updateData() {
 
 void showOverview() {
   tft.fillScreen(WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
 
   drawTime();
   drawCurrentWeather();
@@ -180,7 +180,7 @@ void todayDetail(int baseline) {
   int lineSize = 20;
   int startPoint = 0;   // Position in text of next character to print
 
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
 
@@ -218,7 +218,7 @@ void showForecastDetail() {
   int finalSpace;
 
   tft.fillScreen(WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
 
@@ -264,18 +264,18 @@ void drawTime() {
 
   ui.setTextAlignment(CENTER);
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
 
   String dateS = String(dayStr(dayOfWeek)) + ", " + String(monthStr(month(local))) + " " + String(day(local));
   ui.drawString(150, 20, dateS);
 
   String ampm = "am";
-  //tft.setFont(&ArialRoundedMTBold_36);
+  //tft.setFont(&largeFont);
   if (hours > 12) {
     hours -= 12;
     ampm = "pm";
   }
-  String timeS = String(hours) + ":" + String(minutes) + ampm;
+  String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
   //ui.drawString(120, 56, timeS);
   ui.drawString(150, 40, timeS);
   //drawSeparator(65);
@@ -289,14 +289,14 @@ void drawCurrentWeather() {
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
   // Weather Text
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
 //  ui.drawString(220, 40, wunderground.getWeatherText());
   //ui.drawString(220, 40, wunderground.getWeatherText());
   ui.drawString(240, 80, wunderground.getWeatherText());
 
-  tft.setFont(&ArialRoundedMTBold_36);
+  tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
@@ -324,13 +324,13 @@ void drawForecast() {
 // helper for the forecast columns
 void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
   String day = wunderground.getForecastTitle(dayIndex).substring(0, 3);
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 
-  tft.setFont(&ArialRoundedMTBold_36);
+  tft.setFont(&largeFont);
   ui.setTextColor(WX_WHITE, WX_BLACK);
   ui.drawString(x + 40, y + 40, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
 
@@ -349,7 +349,7 @@ void drawAstronomy() {
   ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline);
 
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);
+  tft.setFont(&smallFont);
   ui.setTextAlignment(LEFT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.drawString(baseX, baseline+15, "Sun");
