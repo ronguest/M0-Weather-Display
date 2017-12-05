@@ -345,7 +345,7 @@ void drawAstronomy() {
   int baseline = 410;   // Place at the bottom
   int baseX = 20;
 //  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
-  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline);
+  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline+5);
 
   ui.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);
