@@ -86,7 +86,7 @@ void WundergroundClient::doUpdate(String url) {
   parser.setListener(this);
   WiFiClient client;
   const int httpPort = 80;
-  const char* server = "api.wunderground.com";
+  char server[] = "api.wunderground.com";
   // Red LED output on the M0 Feather
   const int ledPin = 13;
 
@@ -101,7 +101,7 @@ void WundergroundClient::doUpdate(String url) {
     return;
   }
 
-  Serial.print(F("Requesting URL: ")); Serial.println(server + '/' + url); Serial.flush();
+  Serial.print("Requesting URL: "); Serial.println(server + url); Serial.flush();
 
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
@@ -166,6 +166,7 @@ void WundergroundClient::startDocument() {
 }
 
 void WundergroundClient::key(String key) {
+  Serial.print("key: " + key);
   currentKey = String(key);
   if (currentKey == "txt_forecast") {
     isSimpleForecast = false;
@@ -176,6 +177,7 @@ void WundergroundClient::key(String key) {
 }
 
 void WundergroundClient::value(String value) {
+  Serial.println(", value: " + value);
   if (currentKey == "local_epoch") {
     localEpoc = value.toInt();
     localMillisAtUpdate = millis();
@@ -275,6 +277,7 @@ void WundergroundClient::value(String value) {
   }
   if (currentKey == "temp_f" && !isMetric) {
     currentTemp = value;
+    Serial.println("temp_f =" + value);
   }
   if (currentKey == "temp_c" && isMetric) {
     currentTemp = value;
