@@ -23,7 +23,7 @@ SOFTWARE.
 See more at http://blog.squix.ch
 */
 
-#include <Adafruit_WINC1500.h>
+#include <WiFi101.h>
 #include "WundergroundClient.h"
 
 extern "C" char *sbrk(int i);
@@ -84,7 +84,7 @@ void WundergroundClient::updateAstronomy(String apiKey, String language, String 
 void WundergroundClient::doUpdate(String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
-  Adafruit_WINC1500Client client;
+  WiFiClient client;
   const int httpPort = 80;
   const char* server = "api.wunderground.com";
   // Red LED output on the M0 Feather

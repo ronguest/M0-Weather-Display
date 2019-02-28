@@ -47,10 +47,9 @@ void setup(void) {
   Serial.begin(115200);
   delay(1000);
 
-  #ifdef WINC_EN
-    pinMode(WINC_EN, OUTPUT);
-    digitalWrite(WINC_EN, HIGH);
-  #endif
+  //Configure pins for Adafruit ATWINC1500 Feather
+  WiFi.setPins(8,7,4,2);
+
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 

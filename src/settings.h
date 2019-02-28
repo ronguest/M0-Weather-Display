@@ -4,14 +4,14 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>      // this is needed even tho we aren't using it
+#include <WiFi101.h>
+#include <WiFiUDP.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <Adafruit_HX8357.h>
 #include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
-#include <Adafruit_WINC1500.h>
-#include <Adafruit_WINC1500Udp.h>
 #include <TimeLib.h>
 #include <Timezone.h>
 #include "credentials.h"
@@ -54,21 +54,11 @@ const int ledPin = 13;
 
 #define PENRADIUS 3
 
-// Define the WINC1500 board connections below.
-// If you're following the Adafruit WINC1500 board
-// guide you don't need to modify these:
-#define WINC_CS   8
-#define WINC_IRQ  7
-#define WINC_RST  4
-#define WINC_EN   2     // or, tie EN to VCC and comment this out
 // The SPI pins of the WINC1500 (SCK, MOSI, MISO) should be
 // connected to the hardware SPI port of the Arduino.
 // On an Uno or compatible these are SCK = #13, MISO = #12, MOSI = #11.
 // On an Arduino Zero use the 6-pin ICSP header, see:
 //   https://www.arduino.cc/en/Reference/SPI
-
-// Setup the WINC1500 connection with the pins above and the default hardware SPI.
-Adafruit_WINC1500 WiFi(WINC_CS, WINC_IRQ, WINC_RST);
 
 // Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
 //Adafruit_WINC1500 WiFi;
@@ -98,7 +88,7 @@ unsigned int minutes = 0;                    // Track minutes
 unsigned int seconds = 0;                    // Track seconds
 unsigned int dayOfWeek = 0;                  // Sunday == 1
 
-Adafruit_WINC1500UDP Udp;
+WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 time_t getNtpTime();
 void sendNTPpacket(IPAddress &address);
