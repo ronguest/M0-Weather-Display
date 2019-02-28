@@ -31,7 +31,6 @@ void drawCurrentWeather();
 void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex);
 void drawForecast();
 void drawAstronomy();
-String getMeteoconIcon(String iconText);
 void drawProgress(uint8_t percentage, String text);
 void drawTime();
 void drawSeparator(uint16_t y);
@@ -141,12 +140,11 @@ void updateData() {
   local = usCT.toLocal(now(), &tcr);
   thisHour = hour(local);
 
-  wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+  wunderground.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
   // We only update the Forecast and Astronomy once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
-    wunderground.updateForecast(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
-    wunderground.updateAstronomy(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+    wunderground.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {
@@ -282,7 +280,7 @@ void drawTime() {
 // draws current weather information
 void drawCurrentWeather() {
   // Weather Icon
-  String weatherIcon = getMeteoconIcon(wunderground.getTodayIcon());
+  String weatherIcon = wunderground.getTodayIcon();
 //  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
@@ -332,7 +330,7 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_WHITE, WX_BLACK);
   ui.drawString(x + 40, y + 40, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
 
-  String weatherIcon = getMeteoconIcon(wunderground.getForecastIcon(dayIndex));
+  String weatherIcon = wunderground.getForecastIcon(dayIndex);
   //ui.drawBmp("/Minis/" + weatherIcon + ".bmp", x, y + 15);
   //ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
@@ -364,30 +362,6 @@ void drawAstronomy() {
 
 }
 
-// Helper function, should be part of the weather station library and should disappear soon
-// I got the original bmp files from: http://www.squix.org/blog/wunderground/partlycloudy.bmp
-String getMeteoconIcon(String iconText) {
-  if (iconText == "F") return "flurries";
-  if (iconText == "Q") return "rain";
-  if (iconText == "W") return "sleet";
-  if (iconText == "V") return "snow";
-  if (iconText == "S") return "tstorms";
-  if (iconText == "B") return "clear";
-  if (iconText == "Y") return "cloudy";
-  if (iconText == "F") return "flurries";
-  if (iconText == "M") return "fog";
-  if (iconText == "E") return "hazy";
-  if (iconText == "Y") return "mcloudy";
-  if (iconText == "H") return "msunny";
-  if (iconText == "H") return "pcloudy";
-  if (iconText == "J") return "pysunny";
-  if (iconText == "W") return "sleet";
-  if (iconText == "R") return "rain";
-  if (iconText == "W") return "snow";
-  if (iconText == "B") return "sunny";
-  if (iconText == "0") return "tstorms";
-  return "unknown";
-}
 // Progress bar helper
 void drawProgress(uint8_t percentage, String text) {
   ui.setTextAlignment(CENTER);

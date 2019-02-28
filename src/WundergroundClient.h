@@ -30,7 +30,7 @@ See more at http://blog.squix.ch
 #include <SPI.h>
 #include <SD.h>
 
-#define MAX_FORECAST_PERIODS 12  // Changed from 7 to 12 to support 6 day / 2 screen forecast (Neptune)
+#define MAX_FORECAST_PERIODS 24  // Changed from 7 to 12 to support 6 day / 2 screen forecast (Neptune)
 
 class WundergroundClient: public JsonListener {
   private:
@@ -53,19 +53,19 @@ class WundergroundClient: public JsonListener {
     String windSpeed;
     String windDir;
     // end JJG add ////////////////////////////////////////////////////////////////////////////////////
-    String weatherIcon;
+    int weatherIcon;
     String weatherText;
     String humidity;
     String pressure;
     String dewPoint;
     String precipitationToday;
-    void doUpdate(String url);
+    void doUpdate(char server[], String url);
 
     // forecast
     boolean isForecast = false;
     boolean isSimpleForecast = true;
     int currentForecastPeriod;
-    String forecastIcon [MAX_FORECAST_PERIODS];
+    int forecastIcon [MAX_FORECAST_PERIODS];
     String forecastTitle [MAX_FORECAST_PERIODS];
     String forecastLowTemp [MAX_FORECAST_PERIODS];
     String forecastHighTemp [MAX_FORECAST_PERIODS];
@@ -74,14 +74,9 @@ class WundergroundClient: public JsonListener {
 
   public:
     WundergroundClient(boolean isMetric);
-    void updateConditions(String apiKey, String language, String country, String city);
-    // PWS added by RG, commented out conflict ZMW as it doesn't seem to be used???
-    void updateConditions(String apiKey, String language, String pws);
-    //void updateConditions(String apiKey, String language, String zmwCode);
-    void updateForecast(String apiKey, String language, String country, String city);
-    void updateForecast(String apiKey, String language, String pws);
-    void updateAstronomy(String apiKey, String language, String country, String city);
-    void updateAstronomy(String apiKey, String language, String pws);
+    void updateConditions(String device, String appKey, String apiKey);
+    void updateForecast(String postalKey, String apiKey);
+
     // JJG added
     String getHours();
     String getMinutes();
@@ -97,16 +92,14 @@ class WundergroundClient: public JsonListener {
     String getMoonsetTime();
     String getWindSpeed();
     String getWindDir();
-    // end JJG add ///////////////////////////////////////////////////////////////////////
     long getCurrentEpoch();
-
     String getCurrentTemp();
 
     String getTodayIcon();
 
-    String getTodayIconText();
+    //int getTodayIconText();
 
-    String getMeteoconIcon(String iconText);
+    String getMeteoconIcon(int iconCode);
 
     String getWeatherText();
 
