@@ -120,6 +120,6 @@ int currentMinute;
 
 // Wunderground Settings
 const boolean IS_METRIC = false;
-const String WUNDERGRROUND_LANGUAGE = "EN";
+const String WUNDERGRROUND_LANGUAGE = "en-US";
 
 boolean showForecastText = false;

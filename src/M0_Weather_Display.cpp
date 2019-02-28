@@ -142,12 +142,11 @@ void updateData() {
   local = usCT.toLocal(now(), &tcr);
   thisHour = hour(local);
 
-  wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+  wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGROUND_PWS);
   // We only update the Forecast and Astronomy once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
-    wunderground.updateForecast(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
-    wunderground.updateAstronomy(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_PWS);
+    wunderground.updateForecast(WUNDERGRROUND_API_KEY, WUNDERGROUND_POSTAL_KEY);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {

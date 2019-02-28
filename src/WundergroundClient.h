@@ -74,14 +74,9 @@ class WundergroundClient: public JsonListener {
 
   public:
     WundergroundClient(boolean isMetric);
-    void updateConditions(String apiKey, String language, String country, String city);
-    // PWS added by RG, commented out conflict ZMW as it doesn't seem to be used???
-    void updateConditions(String apiKey, String language, String pws);
-    //void updateConditions(String apiKey, String language, String zmwCode);
-    void updateForecast(String apiKey, String language, String country, String city);
-    void updateForecast(String apiKey, String language, String pws);
-    void updateAstronomy(String apiKey, String language, String country, String city);
-    void updateAstronomy(String apiKey, String language, String pws);
+    void updateConditions(String apiKey,  String pws);
+    void updateForecast(String apiKey, String postal);
+
     // JJG added
     String getHours();
     String getMinutes();
@@ -132,7 +127,7 @@ class WundergroundClient: public JsonListener {
 
     virtual void startDocument();
 
-    virtual void key(String key);
+    //virtual void key(String key);
 
     virtual void value(String value);
 

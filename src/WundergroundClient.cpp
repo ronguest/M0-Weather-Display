@@ -42,51 +42,22 @@ WundergroundClient::WundergroundClient(boolean _isMetric) {
 // **********
 
 // For retrieving based on location
-void WundergroundClient::updateConditions(String apiKey, String language, String country, String city) {
+void WundergroundClient::updateConditions(String apiKey, String pws) {
   isForecast = false;
-  doUpdate("/api/" + apiKey + "/conditions/lang:" + language + "/q/" + country + "/" + city + ".json");
+  doUpdate("v2/pws/observations/current?stationId=" + pws + "&format=json&units=e&apiKey=" + apiKey);
 }
 
-void WundergroundClient::updateForecast(String apiKey, String language, String country, String city) {
+void WundergroundClient::updateForecast(String apiKey, String postal) {
   isForecast = true;
-  doUpdate("/api/" + apiKey + "/forecast10day/lang:" + language + "/q/" + country + "/" + city + ".json");
+  doUpdate("v3/wx/forecast/daily/5day?postalKey=" + postal + "/forecast10day/lang:" + "S&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
-
-// JJG added ////////////////////////////////
-void WundergroundClient::updateAstronomy(String apiKey, String language, String country, String city) {
-  isForecast = true;
-  doUpdate("/api/" + apiKey + "/astronomy/lang:" + language + "/q/" + country + "/" + city + ".json");
-}
-// end JJG add  ////////////////////////////////////////////////////////////////////
-
-//*************************************
-// For retreiving based on a Personal Weather Station (PWS) -- added by RG
-void WundergroundClient::updateConditions(String apiKey, String language, String pws) {
-    isForecast = false;
-    doUpdate("/api/" + apiKey + "/conditions/lang:" + language + "/q/" + pws + ".json");
-}
-
-// wunderground change the API URL scheme:
-void WundergroundClient::updateForecast(String apiKey, String language, String pws) {
-    isForecast = true;
-    doUpdate("/api/" + apiKey + "/forecast10day/lang:" + language + "/q/" + pws + ".json");
-}
-
-// JJG added ////////////////////////////////
-void WundergroundClient::updateAstronomy(String apiKey, String language, String pws) {
-    isForecast = true;
-    doUpdate("/api/" + apiKey + "/astronomy/lang:" + language + "/q/" + pws + ".json");
-}
-// end JJG add  ////////////////////////////////////////////////////////////////////
-
-// end added by RG
 
 void WundergroundClient::doUpdate(String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
   Adafruit_WINC1500Client client;
-  const int httpPort = 80;
-  const char* server = "api.wunderground.com";
+  const int httpPort = 443;
+  const char* server = "api.weather.com";
   // Red LED output on the M0 Feather
   const int ledPin = 13;
 
@@ -105,7 +76,7 @@ void WundergroundClient::doUpdate(String url) {
 
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
-               "Host: api.wunderground.com\r\n" +
+               "Host: api.weather.com\r\n" +
                "Connection: close\r\n\r\n");
 
   char stack_dummy = 0;
@@ -165,120 +136,27 @@ void WundergroundClient::startDocument() {
   Serial.println(F("start document"));
 }
 
-void WundergroundClient::key(String key) {
-  currentKey = String(key);
-  if (currentKey == "txt_forecast") {
-    isSimpleForecast = false;
-  }
-  if (currentKey == "simpleforecast") {
-    isSimpleForecast = true;
-  }
-}
-
 void WundergroundClient::value(String value) {
-  if (currentKey == "local_epoch") {
-    localEpoc = value.toInt();
-    localMillisAtUpdate = millis();
-  }
-
-  // JJG added ... //////////////////////// search for keys /////////////////////////
-  if (currentKey == "percentIlluminated") {
-    moonPctIlum = value;
-  }
-
-  if (currentKey == "ageOfMoon") {
+  if (currentKey == "moonPhaseDay") {
     moonAge = value;
   }
 
-  if (currentKey == "phaseofMoon") {
+  if (currentKey == "moonPhase") {
     moonPhase = value;
   }
 
-
-  if (currentParent == "sunrise") {      // Has a Parent key and 2 sub-keys
-	if (currentKey == "hour") {
-		int tempHour = value.toInt();    // do this to concert to 12 hour time (make it a function!)
-		if (usePM && tempHour > 12){
-			tempHour -= 12;
-			isPM = true;
-		}
-		else isPM = false;
-		sunriseTime = String(tempHour);
-        //sunriseTime = value;
-      }
-	if (currentKey == "minute") {
-    sunriseTime += ":" + value;
-	if (isPM) sunriseTime += "pm";
-	else if (usePM) sunriseTime += "am";
-   }
-  }
-
-
-  if (currentParent == "sunset") {      // Has a Parent key and 2 sub-keys
-	if (currentKey == "hour") {
-		int tempHour = value.toInt();   // do this to concert to 12 hour time (make it a function!)
-		if (usePM && tempHour > 12){
-			tempHour -= 12;
-			isPM = true;
-		}
-		else isPM = false;
-		sunsetTime = String(tempHour);
-       // sunsetTime = value;
-      }
-	if (currentKey == "minute") {
-    sunsetTime += ":" + value;
-	if (isPM) sunsetTime += "pm";
-	else if(usePM) sunsetTime += "am";
-   }
-  }
-
-  if (currentParent == "moonrise") {      // Has a Parent key and 2 sub-keys
-	if (currentKey == "hour") {
-		int tempHour = value.toInt();   // do this to concert to 12 hour time (make it a function!)
-		if (usePM && tempHour > 12){
-			tempHour -= 12;
-			isPM = true;
-		}
-		else isPM = false;
-		moonriseTime = String(tempHour);
-       // moonriseTime = value;
-      }
-	if (currentKey == "minute") {
-    moonriseTime += ":" + value;
-	if (isPM) moonriseTime += "pm";
-	else if (usePM) moonriseTime += "am";
-
-   }
-  }
-
-  if (currentParent == "moonset") {      // Not used - has a Parent key and 2 sub-keys
-	if (currentKey == "hour") {
-        moonsetTime = value;
-      }
-	if (currentKey == "minute") {
-    moonsetTime += ":" + value;
-   }
-  }
-
-  if (currentKey == "wind_mph") {
+  if (currentKey == "windSpeed") {
     windSpeed = value;
   }
 
-   if (currentKey == "wind_dir") {
+   if (currentKey == "windDirection") {
     windDir = value;
   }
 
-// end JJG add  ////////////////////////////////////////////////////////////////////
+  if (currentKey == "temp") {
+    currentTemp = value;
+  }
 
-   if (currentKey == "observation_time_rfc822") {
-    date = value.substring(0, 16);
-  }
-  if (currentKey == "temp_f" && !isMetric) {
-    currentTemp = value;
-  }
-  if (currentKey == "temp_c" && isMetric) {
-    currentTemp = value;
-  }
   if (currentKey == "icon") {
     if (isForecast && !isSimpleForecast && currentForecastPeriod < MAX_FORECAST_PERIODS) {
       //Serial.println(String(currentForecastPeriod) + ": " + value + ":" + currentParent);
@@ -288,47 +166,24 @@ void WundergroundClient::value(String value) {
       weatherIcon = value;
     }
   }
-  if (currentKey == "weather") {
+  weatherIcon = "unk";
+
+  if (currentKey == "wxPhraseLong") {
     weatherText = value;
   }
-  if (currentKey == "relative_humidity") {
+  if (currentKey == "humidity") {
     humidity = value;
   }
-  if (currentKey == "pressure_mb" && isMetric) {
-    pressure = value + "mb";
-  }
-  if (currentKey == "pressure_in" && !isMetric) {
-    pressure = value + "in";
-  }
-  if (currentKey == "dewpoint_f" && !isMetric) {
-    dewPoint = value;
-  }
-  if (currentKey == "dewpoint_c" && isMetric) {
-    dewPoint = value;
-  }
-  if (currentKey == "precip_today_metric" && isMetric) {
-    precipitationToday = value + "mm";
-  }
-  if (currentKey == "precip_today_in" && !isMetric) {
-    precipitationToday = value + "in";
-  }
-  if (currentKey == "period") {
-    currentForecastPeriod = value.toInt();
-  }
-  if (currentKey == "title" && currentForecastPeriod < MAX_FORECAST_PERIODS) {
-      //Serial.println(String(currentForecastPeriod) + ": " + value);
-      forecastTitle[currentForecastPeriod] = value;
-  }
 
-  if (currentKey == "fcttext" && currentForecastPeriod < MAX_FORECAST_PERIODS) {
+  if (currentKey == "narrative" && currentForecastPeriod < MAX_FORECAST_PERIODS) {
       //Serial.println(String(currentForecastPeriod) + ": " + value);
       fcttext[currentForecastPeriod] = value;
   }
   // The detailed forecast period has only one forecast per day with low/high for both
   // night and day, starting at index 1.
-  int dailyForecastPeriod = (currentForecastPeriod - 1) * 2;
+/*  int dailyForecastPeriod = (currentForecastPeriod - 1) * 2;
 
-  if (currentKey == "fahrenheit" && !isMetric && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
+  if (currentKey == "fahrenheit" && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
 
       if (currentParent == "high") {
         forecastHighTemp[dailyForecastPeriod] = value;
@@ -337,7 +192,7 @@ void WundergroundClient::value(String value) {
         forecastLowTemp[dailyForecastPeriod] = value;
       }
   }
-  if (currentKey == "celsius" && isMetric && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
+  if (currentKey == "celsius" && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
 
       if (currentParent == "high") {
         //Serial.println(String(currentForecastPeriod)+ ": " + value);
@@ -346,7 +201,7 @@ void WundergroundClient::value(String value) {
       if (currentParent == "low") {
         forecastLowTemp[dailyForecastPeriod] = value;
       }
-  }
+  }*/
 }
 
 void WundergroundClient::endArray() {
