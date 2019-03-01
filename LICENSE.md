@@ -1,5 +1,5 @@
 # M0 Weather Display
-Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
+Copyright (C) 2017 Ronald Guest <http://ronguest.net>
 
                 GNU GENERAL PUBLIC LICENSE
                    Version 3, 29 June 2007
