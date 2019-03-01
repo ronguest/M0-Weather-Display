@@ -4,12 +4,12 @@
 char ssid[] = "SSID";     //  your network SSID (name)
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
 
-// I am using a PWS (personal weather station) on wunderground.com.
-// 1. Replace WAPI_KEY with your wunderground API key
-// 2. Replace PWS_ID with the PWS ID you want to use, or...
-//    or
-//    you can switch to using a Country and State/City code
-const String WUNDERGRROUND_API_KEY = F("WAPI_KEY");
-const String WUNDERGROUND_PWS = "pws:PWD_ID";
-//const String WUNDERGROUND_COUNTRY = "US";
-//const String WUNDERGROUND_CITY = "FL/Royal_Palm_Beach";
+// wunderground/weather.com inputs
+const String WUNDERGRROUND_API_KEY = "";
+const String WUNDERGROUND_PWS = "";
+const String WUNDERGROUND_POSTAL_KEY = "";    // e.g. 90210:US
+
+// Ambient Weather inputs
+const String AW_APP_KEY = "";
+const String AW_API_KEY = "";
+const String AW_DEVICE = "";

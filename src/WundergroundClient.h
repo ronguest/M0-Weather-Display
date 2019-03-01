@@ -40,9 +40,7 @@ class WundergroundClient: public JsonListener {
     int gmtOffset = 1;
     long localMillisAtUpdate;
     String date = "-";
-    boolean isMetric = true;
     String currentTemp;
-    // JJG added ... ////////////////////////////////// define returns /////////////////////////////////
     String moonPctIlum;  // not used
     String moonAge;      // make this a long?
     String moonPhase;
@@ -52,7 +50,6 @@ class WundergroundClient: public JsonListener {
     String moonsetTime;
     String windSpeed;
     String windDir;
-    // end JJG add ////////////////////////////////////////////////////////////////////////////////////
     int weatherIcon;
     String weatherText;
     String humidity;
@@ -73,7 +70,7 @@ class WundergroundClient: public JsonListener {
 
 
   public:
-    WundergroundClient(boolean isMetric);
+    WundergroundClient(boolean foo);
     void updateConditions(String device, String appKey, String apiKey);
     void updateForecast(String postalKey, String apiKey);
 

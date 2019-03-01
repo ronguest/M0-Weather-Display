@@ -16,8 +16,7 @@ Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 GfxUi ui = GfxUi(&tft);
 
-// Set to false, if you prefere imperial/inches, Fahrenheit
-WundergroundClient wunderground(IS_METRIC);
+WundergroundClient wunderground(true);
 
 //declaring prototypes
 void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTotal);
@@ -84,6 +83,7 @@ void setup(void) {
     delay(5000);
   }
 
+  // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
   if (!SD.begin(SD_CS)) {
     Serial.println("SD failed!");
@@ -102,14 +102,9 @@ void setup(void) {
   }
 
   currentHour = -1;
-
-  //updateData();
 }
 
 void loop() {
-  //int currentMinute;
-  //int thisHour;
-
   // Check if we should update weather information
   if ((millis() - lastDownloadUpdate) > (1000 * UPDATE_INTERVAL_SECS)) {
     // Always display overview after an update
@@ -141,7 +136,7 @@ void updateData() {
   thisHour = hour(local);
 
   wunderground.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
-  // We only update the Forecast and Astronomy once an hour. They don't change much
+  // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
     wunderground.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
@@ -296,9 +291,6 @@ void drawCurrentWeather() {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
-  if (IS_METRIC) {
-    degreeSign = "C";
-  }
   String temp = wunderground.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
@@ -313,7 +305,7 @@ void drawForecast() {
 //  drawForecastDetail(10, drop, 0);
 //  drawForecastDetail(130, drop, 2);
   drawForecastDetail(30, drop, 0);
-  drawForecastDetail(200, drop, 2);
+  drawForecastDetail(200, drop, 1);
   //drawSeparator(drop + 65 + 10);
 }
 
@@ -322,7 +314,7 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = wunderground.getForecastTitle(dayIndex).substring(0, 3);
+  String day = wunderground.getForecastTitle( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 

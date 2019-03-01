@@ -33,15 +33,9 @@ File myFile;
 bool usePM = false; // Set to true if you want to use AM/PM time disaply
 bool isPM = false; // JJG added ///////////
 
-WundergroundClient::WundergroundClient(boolean _isMetric) {
-  isMetric = _isMetric;
+WundergroundClient::WundergroundClient(boolean foo) {
 }
 
-// **********
-// Example URL for the 10 day forecast: http://api.wunderground.com/api/APIKey/forecast10day/q/pws:KTXALLEN99.json
-// **********
-
-// For retrieving based on location
 void WundergroundClient::updateConditions(String device, String appKey, String apiKey) {
   isForecast = false;
   doUpdate("api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
@@ -56,7 +50,6 @@ void WundergroundClient::doUpdate(char server[], String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
   WiFiClient client;
-  //const int httpPort = 80;
   // Red LED output on the M0 Feather
   const int ledPin = 13;
 
@@ -116,49 +109,37 @@ void WundergroundClient::whitespace(char c) {
 }
 
 void WundergroundClient::startDocument() {
-  Serial.println(F("start document"));
+  //Serial.println(F("start document"));
 }
 
 void WundergroundClient::key(String key) {
-  Serial.print("key: " + key);
+  //Serial.print("key: " + key);
   currentKey = String(key);
 }
 
 void WundergroundClient::value(String value) {
-  Serial.println(", value: " + value);
+  //Serial.println(", value: " + value);
 
   if (currentKey == "windspeedmph") {
     windSpeed = value;
   }
-
   if (currentKey == "winddir") {
     windDir = value;
   }
-
   if (currentKey == "tempf") {
     currentTemp = value;
-    Serial.println("tempf =" + value);
   }
-
   if (currentKey == "temperatureMax") {
-    //Serial.println("got temp max");
     forecastHighTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "temperatureMin") {
-    //Serial.println("got temp min");
     forecastLowTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "iconCode") {
-    //Serial.println("got iconCode");
     forecastIcon[currentForecastPeriod++] = value.toInt();
   }
   if (currentKey == "narrative") {
-    //Serial.println("got forecast text");
     fcttext[currentForecastPeriod++] = value;
-  }
-
-  if (currentKey == "weather") {
-    weatherText = value;
   }
   if (currentKey == "humidity") {
     humidity = value;
@@ -172,89 +153,15 @@ void WundergroundClient::value(String value) {
   if (currentKey == "dailyrainin") {
     precipitationToday = value + "in";
   }
-
-  if (currentKey == "percentIlluminated") {
-    moonPctIlum = value;
-  }
-
   if (currentKey == "moonPhaseDay") {
     moonAge = value;
   }
-
-  if (currentKey == "phaseofMoon") {
-    moonPhase = value;
-  }
-
-  if (currentParent == "sunrise") {      // Has a Parent key and 2 sub-keys
-  	if (currentKey == "hour") {
-    		int tempHour = value.toInt();    // do this to concert to 12 hour time (make it a function!)
-    		if (usePM && tempHour > 12){
-    			tempHour -= 12;
-    			isPM = true;
-    		}
-    		else isPM = false;
-    		sunriseTime = String(tempHour);
-            //sunriseTime = value;
-    }
-  	if (currentKey == "minute") {
-        sunriseTime += ":" + value;
-    	  if (isPM) sunriseTime += "pm";
-    	  else if (usePM) sunriseTime += "am";
-     }
-  }
-
-  if (currentParent == "sunset") {      // Has a Parent key and 2 sub-keys
-  	if (currentKey == "hour") {
-  		int tempHour = value.toInt();   // do this to concert to 12 hour time (make it a function!)
-  		if (usePM && tempHour > 12){
-  			tempHour -= 12;
-  			isPM = true;
-  		}
-  		else isPM = false;
-  		sunsetTime = String(tempHour);
-         // sunsetTime = value;
-      }
-	if (currentKey == "minute") {
-      sunsetTime += ":" + value;
-  	if (isPM) sunsetTime += "pm";
-  	else if(usePM) sunsetTime += "am";
-   }
-  }
-
-  if (currentParent == "moonrise") {      // Has a Parent key and 2 sub-keys
-  	if (currentKey == "hour") {
-  		int tempHour = value.toInt();   // do this to concert to 12 hour time (make it a function!)
-  		if (usePM && tempHour > 12){
-  			tempHour -= 12;
-  			isPM = true;
-  		}
-  		else isPM = false;
-  		moonriseTime = String(tempHour);
-         // moonriseTime = value;
-        }
-  	if (currentKey == "minute") {
-      moonriseTime += ":" + value;
-  	if (isPM) moonriseTime += "pm";
-  	else if (usePM) moonriseTime += "am";
-
-     }
-  }
-
-  if (currentParent == "moonset") {      // Not used - has a Parent key and 2 sub-keys
-  	if (currentKey == "hour") {
-          moonsetTime = value;
-        }
-  	if (currentKey == "minute") {
-      moonsetTime += ":" + value;
-     }
-  }
-
   if (currentKey == "daypartName") {
     forecastTitle[currentForecastPeriod++] = value;
   }
 
-  int dailyForecastPeriod = (currentForecastPeriod - 1) * 2;
-
+  // *** I might need to use the below approach -- may handle evenings/night better???
+  /*int dailyForecastPeriod = (currentForecastPeriod - 1) * 2;
   if (currentKey == "fahrenheit" && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
 
       if (currentParent == "high") {
@@ -263,27 +170,29 @@ void WundergroundClient::value(String value) {
       if (currentParent == "low") {
         forecastLowTemp[dailyForecastPeriod] = value;
       }
-  }
+  }*/
+
+  // Prevent currentForecastPeriod going out of bounds (shouldn't happen but...)
   if (currentForecastPeriod >= MAX_FORECAST_PERIODS) {
     currentForecastPeriod = MAX_FORECAST_PERIODS - 1;
   }
 }
 
 void WundergroundClient::endArray() {
-  Serial.println("endArray");
+  //Serial.println("endArray");
 }
 void WundergroundClient::startArray() {
-  Serial.println("startArray");
+  //Serial.println("startArray");
   currentForecastPeriod = 0;
 }
 
 void WundergroundClient::startObject() {
   currentParent = currentKey;
-  Serial.println("startObject: " + currentParent);
+  //Serial.println("startObject: " + currentParent);
 }
 
 void WundergroundClient::endObject() {
-  Serial.println("endObject: " + currentParent);
+  //Serial.println("endObject: " + currentParent);
   currentParent = "";
 }
 
