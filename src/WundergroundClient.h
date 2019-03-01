@@ -42,7 +42,7 @@ class WundergroundClient: public JsonListener {
     String date = "-";
     String currentTemp;
     String moonPctIlum;  // not used
-    String moonAge;      // make this a long?
+    String moonAge[MAX_FORECAST_PERIODS];      // make this a long?
     String moonPhase;
     String sunriseTime;
     String sunsetTime;

@@ -130,7 +130,10 @@ void WundergroundClient::value(String value) {
     currentTemp = value;
   }
   if (currentKey == "temperatureMax") {
-    forecastHighTemp[currentForecastPeriod++] = value;
+    // Should only be null afer 3pm which is an arbitrary cut off by WU ?
+    if (!value.equalsIgnoreCase("null")) {
+      forecastHighTemp[currentForecastPeriod++] = value;
+    }
   }
   if (currentKey == "temperatureMin") {
     forecastLowTemp[currentForecastPeriod++] = value;
@@ -139,7 +142,9 @@ void WundergroundClient::value(String value) {
     forecastIcon[currentForecastPeriod++] = value.toInt();
   }
   if (currentKey == "narrative") {
-    fcttext[currentForecastPeriod++] = value;
+    if (!value.equalsIgnoreCase("null")) {
+      fcttext[currentForecastPeriod++] = value;
+    }
   }
   if (currentKey == "humidity") {
     humidity = value;
@@ -154,7 +159,7 @@ void WundergroundClient::value(String value) {
     precipitationToday = value + "in";
   }
   if (currentKey == "moonPhaseDay") {
-    moonAge = value;
+    moonAge[currentForecastPeriod++] = value;
   }
   if (currentKey == "daypartName") {
     forecastTitle[currentForecastPeriod++] = value;
@@ -246,7 +251,7 @@ String WundergroundClient::getMoonPctIlum() {
 }
 
 String WundergroundClient::getMoonAge() {
-  return moonAge;
+  return moonAge[0];
 }
 
 String WundergroundClient::getMoonPhase() {

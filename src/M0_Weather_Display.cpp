@@ -330,11 +330,15 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
-  int moonAgeImage = 24 * wunderground.getMoonAge().toInt() / 30.0;
+  //int moonAgeImage = 24 * wunderground.getMoonAge().toInt();
   int baseline = 410;   // Place at the bottom
   int baseX = 20;
 //  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
-  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 140, baseline+5);
+  String moonFile;
+
+  moonFile = "/Moon/" + wunderground.getMoonAge() + ".bmp";
+  Serial.println("Load moon file: " + moonFile);
+  ui.drawBmp(moonFile, 140, baseline+5);
 
   ui.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);
