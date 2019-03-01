@@ -16,12 +16,10 @@ WeatherClient::WeatherClient(boolean foo) {
 }
 
 void WeatherClient::updateConditions(String device, String appKey, String apiKey) {
-  isForecast = false;
   doUpdate("api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
 }
 
 void WeatherClient::updateForecast(String postalKey, String apiKey) {
-  isForecast = true;
   doUpdate("api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
@@ -81,14 +79,6 @@ void WeatherClient::doUpdate(char server[], String url) {
   client.stop();          // We're done, shut down the connection
 
   digitalWrite(ledPin, LOW);
-}
-
-void WeatherClient::whitespace(char c) {
-  //Serial.println(F("whitespace"));
-}
-
-void WeatherClient::startDocument() {
-  //Serial.println(F("start document"));
 }
 
 void WeatherClient::key(String key) {
@@ -197,16 +187,8 @@ void WeatherClient::endDocument() {
 
 }
 
-String WeatherClient::getMoonPctIlum() {
-  return moonPctIlum;
-}
-
 String WeatherClient::getMoonAge() {
   return moonAge[0];
-}
-
-String WeatherClient::getMoonPhase() {
-  return moonPhase;
 }
 
 String WeatherClient::getSunriseTime() {
@@ -279,6 +261,14 @@ String WeatherClient::getForecastHighTemp(int period) {
 
 String WeatherClient::getForecastText(int period) {
   return fcttext[period];
+}
+
+void WeatherClient::whitespace(char c) {
+  //Serial.println(F("whitespace"));
+}
+
+void WeatherClient::startDocument() {
+  //Serial.println(F("start document"));
 }
 
 // Converts the WU icon code to the file name for the M0

@@ -15,14 +15,8 @@ class WeatherClient: public JsonListener {
   private:
     String currentKey;
     String currentParent = "";
-    long localEpoc = 0;
-    int gmtOffset = 1;
-    long localMillisAtUpdate;
-    String date = "-";
     String currentTemp;
-    String moonPctIlum;  // not used
     String moonAge[MAX_FORECAST_PERIODS];      // make this a long?
-    String moonPhase;
     String sunriseTime[MAX_FORECAST_PERIODS];
     String sunsetTime[MAX_FORECAST_PERIODS];
     String moonriseTime[MAX_FORECAST_PERIODS];
@@ -38,8 +32,6 @@ class WeatherClient: public JsonListener {
     void doUpdate(char server[], String url);
 
     // forecast
-    boolean isForecast = false;
-    boolean isSimpleForecast = true;
     int currentForecastPeriod;
     int forecastIcon [MAX_FORECAST_PERIODS];
     String forecastTitle [MAX_FORECAST_PERIODS];
@@ -58,60 +50,33 @@ class WeatherClient: public JsonListener {
     String getMinutes();
     String getSeconds();
     String getDate();
-    // JJG added ... ///////////////////function name to string ////////////////////////////
-    String getMoonPctIlum();
     String getMoonAge();
-    String getMoonPhase();
     String getSunriseTime();
     String getSunsetTime();
     String getMoonriseTime();
     String getMoonsetTime();
     String getWindSpeed();
     String getWindDir();
-    long getCurrentEpoch();
     String getCurrentTemp();
-
     String getTodayIcon();
-
-    //int getTodayIconText();
-
     String getMeteoconIcon(int iconCode);
-
     String getWeatherText();
-
     String getHumidity();
-
     String getPressure();
-
     String getDewPoint();
-
     String getPrecipitationToday();
-
     String getForecastIcon(int period);
-
     String getForecastTitle(int period);
-
     String getForecastLowTemp(int period);
-
     String getForecastHighTemp(int period);
-
     String getForecastText(int period);
-
     virtual void whitespace(char c);
-
     virtual void startDocument();
-
     virtual void key(String key);
-
     virtual void value(String value);
-
     virtual void endArray();
-
     virtual void endObject();
-
     virtual void endDocument();
-
     virtual void startArray();
-
     virtual void startObject();
 };
