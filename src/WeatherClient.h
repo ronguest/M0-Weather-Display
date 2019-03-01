@@ -11,7 +11,7 @@
 
 #define MAX_FORECAST_PERIODS 24  // Changed from 7 to 12 to support 6 day / 2 screen forecast (Neptune)
 
-class WundergroundClient: public JsonListener {
+class WeatherClient: public JsonListener {
   private:
     String currentKey;
     String currentParent = "";
@@ -49,7 +49,7 @@ class WundergroundClient: public JsonListener {
 
 
   public:
-    WundergroundClient(boolean foo);
+    WeatherClient(boolean foo);
     void updateConditions(String device, String appKey, String apiKey);
     void updateForecast(String postalKey, String apiKey);
 

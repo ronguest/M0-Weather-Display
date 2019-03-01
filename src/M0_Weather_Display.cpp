@@ -16,7 +16,7 @@ Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 GfxUi ui = GfxUi(&tft);
 
-WundergroundClient wunderground(true);
+WeatherClient weather(true);
 
 //declaring prototypes
 void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTotal);
@@ -135,11 +135,11 @@ void updateData() {
   local = usCT.toLocal(now(), &tcr);
   thisHour = hour(local);
 
-  wunderground.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
+  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
   // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
-    wunderground.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
+    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {
@@ -178,7 +178,7 @@ void todayDetail(int baseline) {
 
   int y = baseline;
   // Starting at 5pm show the forecast for the evening/night instead of the daytime forecast
-  text = wunderground.getForecastText(hours >= 17 ? 1 : 0);   // Period 0 is daytime, period 1 is the night forecast
+  text = weather.getForecastText(hours >= 17 ? 1 : 0);   // Period 0 is daytime, period 1 is the night forecast
   textLength = text.length();
   Serial.print("Today detail length: "); Serial.println(textLength);
   while ((startPoint < textLength) && (maxLines > 0)){
@@ -216,13 +216,13 @@ void showForecastDetail() {
   // We show 4 periods which is 2 days + 2 nights
   for (period=0; period<4; period++) {
     //Serial.print("period: ");Serial.println(period);
-    text = wunderground.getForecastText(period);
+    text = weather.getForecastText(period);
     //Serial.print("forecast text: ");Serial.println(text);
     textLength = text.length();
     Serial.print("Forecast length: "); Serial.println(textLength);
 
     // Draw the name of the period (e.g. "Monday" or "Monday Night")
-    ui.drawString(0, y, wunderground.getForecastTitle(period));
+    ui.drawString(0, y, weather.getForecastTitle(period));
     y += lineSize;
     int startPoint = 0;   // Position in text of next character to print
     while (startPoint < textLength) {
@@ -275,7 +275,7 @@ void drawTime() {
 // draws current weather information
 void drawCurrentWeather() {
   // Weather Icon
-  String weatherIcon = wunderground.getTodayIcon();
+  String weatherIcon = weather.getTodayIcon();
 //  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
@@ -283,15 +283,15 @@ void drawCurrentWeather() {
   tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
-//  ui.drawString(220, 40, wunderground.getWeatherText());
-  //ui.drawString(220, 40, wunderground.getWeatherText());
-  ui.drawString(240, 80, wunderground.getWeatherText());
+//  ui.drawString(220, 40, weather.getWeatherText());
+  //ui.drawString(220, 40, weather.getWeatherText());
+  ui.drawString(240, 80, weather.getWeatherText());
 
   tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
-  String temp = wunderground.getCurrentTemp() + degreeSign;
+  String temp = weather.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
   ui.drawString(240, 120, temp);
@@ -314,15 +314,15 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = wunderground.getForecastTitle( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
+  String day = weather.getForecastTitle( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 
   tft.setFont(&largeFont);
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(x + 40, y + 40, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
+  ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex) + "|" + weather.getForecastHighTemp(dayIndex));
 
-  String weatherIcon = wunderground.getForecastIcon(dayIndex);
+  String weatherIcon = weather.getForecastIcon(dayIndex);
   //ui.drawBmp("/Minis/" + weatherIcon + ".bmp", x, y + 15);
   //ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
@@ -330,13 +330,13 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
-  //int moonAgeImage = 24 * wunderground.getMoonAge().toInt();
+  //int moonAgeImage = 24 * weather.getMoonAge().toInt();
   int baseline = 410;   // Place at the bottom
   int baseX = 20;
 //  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
   String moonFile;
 
-  moonFile = "/Moon/" + wunderground.getMoonAge() + ".bmp";
+  moonFile = "/Moon/" + weather.getMoonAge() + ".bmp";
   Serial.println("Load moon file: " + moonFile);
   ui.drawBmp(moonFile, 140, baseline+5);
 
@@ -346,15 +346,15 @@ void drawAstronomy() {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.drawString(baseX, baseline+25, "Sun");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX, baseline+43, wunderground.getSunriseTime());
-  ui.drawString(baseX, baseline+60, wunderground.getSunsetTime());
+  ui.drawString(baseX, baseline+43, weather.getSunriseTime());
+  ui.drawString(baseX, baseline+60, weather.getSunsetTime());
 
   ui.setTextAlignment(RIGHT);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.drawString(baseX+280, baseline+25, "Moon");
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX+280, baseline+43, wunderground.getMoonriseTime());
-  ui.drawString(baseX+280, baseline+60, wunderground.getMoonsetTime());
+  ui.drawString(baseX+280, baseline+43, weather.getMoonriseTime());
+  ui.drawString(baseX+280, baseline+60, weather.getMoonsetTime());
 
 }
 

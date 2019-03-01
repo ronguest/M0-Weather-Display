@@ -3,7 +3,7 @@
 //
 
 #include <WiFi101.h>
-#include "WundergroundClient.h"
+#include "WeatherClient.h"
 
 extern "C" char *sbrk(int i);
 
@@ -12,20 +12,20 @@ File myFile;
 bool usePM = false; // Set to true if you want to use AM/PM time disaply
 bool isPM = false; // JJG added ///////////
 
-WundergroundClient::WundergroundClient(boolean foo) {
+WeatherClient::WeatherClient(boolean foo) {
 }
 
-void WundergroundClient::updateConditions(String device, String appKey, String apiKey) {
+void WeatherClient::updateConditions(String device, String appKey, String apiKey) {
   isForecast = false;
   doUpdate("api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
 }
 
-void WundergroundClient::updateForecast(String postalKey, String apiKey) {
+void WeatherClient::updateForecast(String postalKey, String apiKey) {
   isForecast = true;
   doUpdate("api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
-void WundergroundClient::doUpdate(char server[], String url) {
+void WeatherClient::doUpdate(char server[], String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
   WiFiClient client;
@@ -83,20 +83,20 @@ void WundergroundClient::doUpdate(char server[], String url) {
   digitalWrite(ledPin, LOW);
 }
 
-void WundergroundClient::whitespace(char c) {
+void WeatherClient::whitespace(char c) {
   //Serial.println(F("whitespace"));
 }
 
-void WundergroundClient::startDocument() {
+void WeatherClient::startDocument() {
   //Serial.println(F("start document"));
 }
 
-void WundergroundClient::key(String key) {
+void WeatherClient::key(String key) {
   //Serial.print("key: " + key);
   currentKey = String(key);
 }
 
-void WundergroundClient::value(String value) {
+void WeatherClient::value(String value) {
   //Serial.println(", value: " + value);
 
   if (currentKey == "windspeedmph") {
@@ -175,114 +175,114 @@ void WundergroundClient::value(String value) {
   }
 }
 
-void WundergroundClient::endArray() {
+void WeatherClient::endArray() {
   //Serial.println("endArray");
 }
-void WundergroundClient::startArray() {
+void WeatherClient::startArray() {
   //Serial.println("startArray");
   currentForecastPeriod = 0;
 }
 
-void WundergroundClient::startObject() {
+void WeatherClient::startObject() {
   currentParent = currentKey;
   //Serial.println("startObject: " + currentParent);
 }
 
-void WundergroundClient::endObject() {
+void WeatherClient::endObject() {
   //Serial.println("endObject: " + currentParent);
   currentParent = "";
 }
 
-void WundergroundClient::endDocument() {
+void WeatherClient::endDocument() {
 
 }
 
-String WundergroundClient::getMoonPctIlum() {
+String WeatherClient::getMoonPctIlum() {
   return moonPctIlum;
 }
 
-String WundergroundClient::getMoonAge() {
+String WeatherClient::getMoonAge() {
   return moonAge[0];
 }
 
-String WundergroundClient::getMoonPhase() {
+String WeatherClient::getMoonPhase() {
   return moonPhase;
 }
 
-String WundergroundClient::getSunriseTime() {
+String WeatherClient::getSunriseTime() {
   return sunriseTime[0];
  }
 
-String WundergroundClient::getSunsetTime() {
+String WeatherClient::getSunsetTime() {
   return sunsetTime[0];
  }
 
-String WundergroundClient::getMoonriseTime() {
+String WeatherClient::getMoonriseTime() {
   return moonriseTime[0];
  }
 
-String WundergroundClient::getMoonsetTime() {
+String WeatherClient::getMoonsetTime() {
   return moonsetTime[0];
  }
 
-String WundergroundClient::getWindSpeed() {
+String WeatherClient::getWindSpeed() {
   return windSpeed;
  }
 
-String WundergroundClient::getWindDir() {
+String WeatherClient::getWindDir() {
   return windDir;
  }
 
-String WundergroundClient::getCurrentTemp() {
+String WeatherClient::getCurrentTemp() {
   return currentTemp;
 }
 
-String WundergroundClient::getWeatherText() {
+String WeatherClient::getWeatherText() {
   return weatherText;
 }
 
-String WundergroundClient::getHumidity() {
+String WeatherClient::getHumidity() {
   return humidity;
 }
 
-String WundergroundClient::getPressure() {
+String WeatherClient::getPressure() {
   return pressure;
 }
 
-String WundergroundClient::getDewPoint() {
+String WeatherClient::getDewPoint() {
   return dewPoint;
 }
 
-String WundergroundClient::getPrecipitationToday() {
+String WeatherClient::getPrecipitationToday() {
   return precipitationToday;
 }
 
-String WundergroundClient::getTodayIcon() {
+String WeatherClient::getTodayIcon() {
   return getMeteoconIcon(forecastIcon[0]);
 }
 
-String WundergroundClient::getForecastIcon(int period) {
+String WeatherClient::getForecastIcon(int period) {
   return getMeteoconIcon(forecastIcon[period]);
 }
 
-String WundergroundClient::getForecastTitle(int period) {
+String WeatherClient::getForecastTitle(int period) {
   return forecastTitle[period];
 }
 
-String WundergroundClient::getForecastLowTemp(int period) {
+String WeatherClient::getForecastLowTemp(int period) {
   return forecastLowTemp[period];
 }
 
-String WundergroundClient::getForecastHighTemp(int period) {
+String WeatherClient::getForecastHighTemp(int period) {
   return forecastHighTemp[period];
 }
 
-String WundergroundClient::getForecastText(int period) {
+String WeatherClient::getForecastText(int period) {
   return fcttext[period];
 }
 
 // Converts the WU icon code to the file name for the M0
-String WundergroundClient::getMeteoconIcon(int iconCode) {
+String WeatherClient::getMeteoconIcon(int iconCode) {
   switch (iconCode){
   case 3:
     return "tstorms";

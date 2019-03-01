@@ -18,7 +18,7 @@
 #include <TimeLib.h>
 #include <Timezone.h>
 #include "credentials.h"
-#include "WundergroundClient.h"
+#include "WeatherClient.h"
 
 #ifdef HX8357
 #include "Fonts/FreeSansBold9pt7b.h"    // Font from Adafruit Gfx library
