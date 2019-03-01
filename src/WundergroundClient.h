@@ -44,10 +44,10 @@ class WundergroundClient: public JsonListener {
     String moonPctIlum;  // not used
     String moonAge[MAX_FORECAST_PERIODS];      // make this a long?
     String moonPhase;
-    String sunriseTime;
-    String sunsetTime;
-    String moonriseTime;
-    String moonsetTime;
+    String sunriseTime[MAX_FORECAST_PERIODS];
+    String sunsetTime[MAX_FORECAST_PERIODS];
+    String moonriseTime[MAX_FORECAST_PERIODS];
+    String moonsetTime[MAX_FORECAST_PERIODS];
     String windSpeed;
     String windDir;
     int weatherIcon;

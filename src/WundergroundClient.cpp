@@ -158,6 +158,19 @@ void WundergroundClient::value(String value) {
   if (currentKey == "dailyrainin") {
     precipitationToday = value + "in";
   }
+  if (currentKey == "sunriseTimeLocal") {
+    Serial.println("sunriseTime: " + value);
+    sunriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
+  }
+  if (currentKey == "sunsetTimeLocal") {
+    sunsetTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
+  }
+  if (currentKey == "moonriseTimeLocal") {
+      moonriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
+    }
+  if (currentKey == "moonsetTimeLocal") {
+      moonsetTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
+    }
   if (currentKey == "moonPhaseDay") {
     moonAge[currentForecastPeriod++] = value;
   }
@@ -245,7 +258,6 @@ long WundergroundClient::getCurrentEpoch() {
   return localEpoc + ((millis() - localMillisAtUpdate) / 1000);
 }
 
-// JJG added ... /////////////////////////////////////////////////////////////////////////////////////////
 String WundergroundClient::getMoonPctIlum() {
   return moonPctIlum;
 }
@@ -259,19 +271,19 @@ String WundergroundClient::getMoonPhase() {
 }
 
 String WundergroundClient::getSunriseTime() {
-  return sunriseTime;
+  return sunriseTime[0];
  }
 
 String WundergroundClient::getSunsetTime() {
-  return sunsetTime;
+  return sunsetTime[0];
  }
 
 String WundergroundClient::getMoonriseTime() {
-  return moonriseTime;
+  return moonriseTime[0];
  }
 
 String WundergroundClient::getMoonsetTime() {
-  return moonsetTime;
+  return moonsetTime[0];
  }
 
 String WundergroundClient::getWindSpeed() {
