@@ -1,6 +1,6 @@
 //
-//  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
-//  Portions Copyright (c) 2015 by Daniel Eichhorn
+//  Copyright (C) 2017-2019 Ronald Guest <http://ronguest.net>
+//
 
 #include "display.h"
 #include "settings.h"

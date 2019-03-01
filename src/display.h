@@ -1,5 +1,8 @@
 //
-//  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
+//  Copyright (C) 2017-2019 Ronald Guest <http://ronguest.net>
+//
+
+#pragma once
 
 // ***** Only one of these should be set - HX8357 is the large TFT display, ILI9341 is the original
 //#define ILI9341 1

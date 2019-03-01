@@ -1,5 +1,8 @@
 //
-//  Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
+//  Copyright (C) 2017-2019 Ronald Guest <http://ronguest.net>
+//
+
+#pragma once
 
 #include <Arduino.h>
 #include <SPI.h>

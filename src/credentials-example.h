@@ -1,5 +1,8 @@
 //
-//   Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
+//  Copyright (C) 2017-2019 Ronald Guest <http://ronguest.net>
+//
+
+#pragma once
 
 char ssid[] = "SSID";     //  your network SSID (name)
 char pass[] = "password";    // your network password (use for WPA, or use as key for WEP)
