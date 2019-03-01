@@ -5,12 +5,7 @@
 #include <WiFi101.h>
 #include "WeatherClient.h"
 
-extern "C" char *sbrk(int i);
-
 File myFile;
-
-bool usePM = false; // Set to true if you want to use AM/PM time disaply
-bool isPM = false; // JJG added ///////////
 
 WeatherClient::WeatherClient(boolean foo) {
 }
@@ -30,7 +25,7 @@ void WeatherClient::doUpdate(char server[], String url) {
   // Red LED output on the M0 Feather
   const int ledPin = 13;
 
-  Serial.print("Server: "); Serial.println(server);
+  Serial.print("Connect to Server: "); Serial.println(server);
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
   if (!client.connect(server, 80)) {
@@ -39,15 +34,12 @@ void WeatherClient::doUpdate(char server[], String url) {
   }
 
   Serial.print("Requesting URL: "); Serial.println(server + url); Serial.flush();
-
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: " + server + "\r\n" +
                "Connection: close\r\n\r\n");
 
-  char stack_dummy = 0;
-  Serial.print("memory remaining is: "); Serial.println(&stack_dummy - sbrk(0));
-
+  // Wait some seconds to start receiving a response
   int retryCounter = 0;
   while(!client.available()) {
     delay(1000);
@@ -58,10 +50,8 @@ void WeatherClient::doUpdate(char server[], String url) {
     }
   }
 
-  //int pos = 0;
   boolean isBody = false;
   char c;
-
   int size = 0;
   //client.setNoDelay(false);
   while(client.connected()) {
@@ -78,17 +68,22 @@ void WeatherClient::doUpdate(char server[], String url) {
   }
   client.stop();          // We're done, shut down the connection
 
-  digitalWrite(ledPin, LOW);
+  digitalWrite(ledPin, LOW);    // Turn LED off to show we're done
 }
 
+// The key basically tells us which set of data from the JSON is coming
 void WeatherClient::key(String key) {
-  //Serial.print("key: " + key);
   currentKey = String(key);
 }
 
-void WeatherClient::value(String value) {
-  //Serial.println(", value: " + value);
+// This is the heart of processing the JSON file
+// The JSON parser calls the appropriate function as it encounters them in the JSON stream
+// Some are arrays of values so we index those as we get them
+// There is a bounds check at the end of the function.
+// If a value = "null" for several of the below we ignore those due to how the Wunderground feed works
+// Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
+void WeatherClient::value(String value) {
   if (currentKey == "windspeedmph") {
     windSpeed = value;
   }
@@ -99,7 +94,6 @@ void WeatherClient::value(String value) {
     currentTemp = value;
   }
   if (currentKey == "temperatureMax") {
-    // Should only be null afer 3pm which is an arbitrary cut off by WU ?
     if (!value.equalsIgnoreCase("null")) {
       forecastHighTemp[currentForecastPeriod++] = value;
     }
@@ -108,6 +102,8 @@ void WeatherClient::value(String value) {
     forecastLowTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "iconCode") {
+    // I mostly leave values as strings because we will display them
+    // iconCode however is used as constant in a switch statement so worth converting here
     forecastIcon[currentForecastPeriod++] = value.toInt();
   }
   if (currentKey == "narrative") {
@@ -147,44 +143,10 @@ void WeatherClient::value(String value) {
     forecastTitle[currentForecastPeriod++] = value;
   }
 
-  // *** I might need to use the below approach -- may handle evenings/night better???
-  /*int dailyForecastPeriod = (currentForecastPeriod - 1) * 2;
-  if (currentKey == "fahrenheit" && dailyForecastPeriod < MAX_FORECAST_PERIODS) {
-
-      if (currentParent == "high") {
-        forecastHighTemp[dailyForecastPeriod] = value;
-      }
-      if (currentParent == "low") {
-        forecastLowTemp[dailyForecastPeriod] = value;
-      }
-  }*/
-
   // Prevent currentForecastPeriod going out of bounds (shouldn't happen but...)
   if (currentForecastPeriod >= MAX_FORECAST_PERIODS) {
     currentForecastPeriod = MAX_FORECAST_PERIODS - 1;
   }
-}
-
-void WeatherClient::endArray() {
-  //Serial.println("endArray");
-}
-void WeatherClient::startArray() {
-  //Serial.println("startArray");
-  currentForecastPeriod = 0;
-}
-
-void WeatherClient::startObject() {
-  currentParent = currentKey;
-  //Serial.println("startObject: " + currentParent);
-}
-
-void WeatherClient::endObject() {
-  //Serial.println("endObject: " + currentParent);
-  currentParent = "";
-}
-
-void WeatherClient::endDocument() {
-
 }
 
 String WeatherClient::getMoonAge() {
@@ -269,6 +231,32 @@ void WeatherClient::whitespace(char c) {
 
 void WeatherClient::startDocument() {
   //Serial.println(F("start document"));
+}
+void WeatherClient::endDocument() {
+
+}
+
+// startArray lets us know the key has a set of values
+// When we see this we set the index to Zero
+// It should be incremented in the value function when a value is added
+void WeatherClient::startArray() {
+  //Serial.println("startArray");
+  currentForecastPeriod = 0;
+}
+// We don't need to do anything special when we get an endArray
+void WeatherClient::endArray() {
+  //Serial.println("endArray");
+}
+
+
+void WeatherClient::startObject() {
+  // I have not seen this to be reliable (?). Unused for now.
+  currentParent = currentKey;
+  //Serial.println("startObject: " + currentParent);
+}
+void WeatherClient::endObject() {
+  //Serial.println("endObject: " + currentParent);
+  currentParent = "";
 }
 
 // Converts the WU icon code to the file name for the M0

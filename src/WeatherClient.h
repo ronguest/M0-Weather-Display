@@ -45,7 +45,6 @@ class WeatherClient: public JsonListener {
     void updateConditions(String device, String appKey, String apiKey);
     void updateForecast(String postalKey, String apiKey);
 
-    // JJG added
     String getHours();
     String getMinutes();
     String getSeconds();
