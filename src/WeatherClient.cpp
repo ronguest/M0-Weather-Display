@@ -176,10 +176,6 @@ String WeatherClient::getCurrentTemp() {
   return currentTemp;
 }
 
-String WeatherClient::getWeatherText() {
-  return weatherText;
-}
-
 String WeatherClient::getTodayIcon() {
   return getMeteoconIcon(forecastIcon[0]);
 }

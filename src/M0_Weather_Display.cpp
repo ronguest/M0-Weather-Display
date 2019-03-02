@@ -279,14 +279,6 @@ void drawCurrentWeather() {
   // WU no longer provides a current weather icon
 //  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
-  // Weather Text
-  tft.setFont(&smallFont);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.setTextAlignment(RIGHT);
-//  ui.drawString(220, 40, weather.getWeatherText());
-  //ui.drawString(220, 40, weather.getWeatherText());
-  ui.drawString(240, 60, weather.getWeatherText());
-
   tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
@@ -294,7 +286,7 @@ void drawCurrentWeather() {
   String temp = weather.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
-  ui.drawString(200, 100, temp);
+  ui.drawString(200, 80, temp);
   //drawSeparator(135);
 }
 

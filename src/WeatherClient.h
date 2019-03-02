@@ -32,7 +32,6 @@ class WeatherClient: public JsonListener {
     String windDir;
     String currentIcon;
     int weatherIcon;
-    String weatherText;
     String humidity;
     String pressure;
     String dewPoint;
@@ -53,7 +52,6 @@ class WeatherClient: public JsonListener {
     String getCurrentTemp();
     String getTodayIcon();
     String getMeteoconIcon(int iconCode);
-    String getWeatherText();
     String getForecastIcon(int period);
     String getForecastTitle(int period);
     String getForecastDayOfWeek(int period);
