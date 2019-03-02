@@ -158,7 +158,7 @@ void showOverview() {
 
   drawTime();
   drawCurrentWeather();
-  todayDetail(150);
+  todayDetail(130);
   drawForecast();
   drawAstronomy();
 }
@@ -286,7 +286,7 @@ void drawCurrentWeather() {
   String temp = weather.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
-  ui.drawString(200, 80, temp);
+  ui.drawString(200, 100, temp);
   //drawSeparator(135);
 }
 
