@@ -166,7 +166,7 @@ void showOverview() {
 void todayDetail(int baseline) {
   int textLength;
   String text;
-  int maxLines = 4;
+  int maxLines = 5;
   int finalSpace;
   int startPoint = 0;   // Position in text of next character to print
 
