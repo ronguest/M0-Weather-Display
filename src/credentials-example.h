@@ -16,3 +16,7 @@ const String WUNDERGROUND_POSTAL_KEY = "";    // e.g. 90210:US
 const String AW_APP_KEY = "";
 const String AW_API_KEY = "";
 const String AW_DEVICE = "";
+
+// Dark Sky
+const String DS_API_KEY = "";
+const String DS_LAT_LON = "";

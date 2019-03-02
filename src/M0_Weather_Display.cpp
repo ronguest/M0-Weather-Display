@@ -135,7 +135,7 @@ void updateData() {
   local = usCT.toLocal(now(), &tcr);
   thisHour = hour(local);
 
-  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
+  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY, DS_API_KEY, DS_LAT_LON);
   // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
@@ -314,7 +314,7 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = weather.getForecastTitle( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
+  String day = weather.getForecastDayOfWeek( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 

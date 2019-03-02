@@ -16,39 +16,35 @@ class WeatherClient: public JsonListener {
     String currentKey;
     String currentParent = "";
     String currentTemp;
-    String moonAge[MAX_FORECAST_PERIODS];      // make this a long?
+    int currentForecastPeriod;
+    int forecastIcon [MAX_FORECAST_PERIODS];
+    String forecastTitle [MAX_FORECAST_PERIODS];
+    String forecastDayOfWeek [MAX_FORECAST_PERIODS];
+    String forecastLowTemp [MAX_FORECAST_PERIODS];
+    String forecastHighTemp [MAX_FORECAST_PERIODS];
+    String fcttext [MAX_FORECAST_PERIODS];
+    String moonAge[MAX_FORECAST_PERIODS];
     String sunriseTime[MAX_FORECAST_PERIODS];
     String sunsetTime[MAX_FORECAST_PERIODS];
     String moonriseTime[MAX_FORECAST_PERIODS];
     String moonsetTime[MAX_FORECAST_PERIODS];
     String windSpeed;
     String windDir;
+    String currentIcon;
     int weatherIcon;
     String weatherText;
     String humidity;
     String pressure;
     String dewPoint;
     String precipitationToday;
-    void doUpdate(char server[], String url);
-
-    // forecast
-    int currentForecastPeriod;
-    int forecastIcon [MAX_FORECAST_PERIODS];
-    String forecastTitle [MAX_FORECAST_PERIODS];
-    String forecastLowTemp [MAX_FORECAST_PERIODS];
-    String forecastHighTemp [MAX_FORECAST_PERIODS];
-    String fcttext [MAX_FORECAST_PERIODS];
-
+    void doUpdate(int port, char server[], String url);
 
   public:
     WeatherClient(boolean foo);
-    void updateConditions(String device, String appKey, String apiKey);
+    void updateConditions(String device, String appKey, String apiKey, String dsApiKey, String dsLatLon);
     void updateForecast(String postalKey, String apiKey);
 
-    String getHours();
-    String getMinutes();
-    String getSeconds();
-    String getDate();
+    String getCurrentIcon();
     String getMoonAge();
     String getSunriseTime();
     String getSunsetTime();
@@ -66,6 +62,7 @@ class WeatherClient: public JsonListener {
     String getPrecipitationToday();
     String getForecastIcon(int period);
     String getForecastTitle(int period);
+    String getForecastDayOfWeek(int period);
     String getForecastLowTemp(int period);
     String getForecastHighTemp(int period);
     String getForecastText(int period);

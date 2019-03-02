@@ -10,15 +10,16 @@ File myFile;
 WeatherClient::WeatherClient(boolean foo) {
 }
 
-void WeatherClient::updateConditions(String device, String appKey, String apiKey) {
-  doUpdate("api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+void WeatherClient::updateConditions(String device, String appKey, String apiKey, String dsApiKey, String dsLatLon) {
+  doUpdate(80, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+  doUpdate(443, "api.darksky.net", "/forecast/" + dsApiKey + "/" + dsLatLon);
 }
 
 void WeatherClient::updateForecast(String postalKey, String apiKey) {
-  doUpdate("api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
+  doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
-void WeatherClient::doUpdate(char server[], String url) {
+void WeatherClient::doUpdate(int port, char server[], String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
   WiFiClient client;
@@ -28,7 +29,7 @@ void WeatherClient::doUpdate(char server[], String url) {
   Serial.print("Connect to Server: "); Serial.println(server);
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
-  if (!client.connect(server, 80)) {
+  if (!client.connect(server, port)) {
     Serial.println("connection failed");
     return;
   }
@@ -84,6 +85,20 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
 void WeatherClient::value(String value) {
+  if (currentKey == "icon") {
+    Serial.println("Initial icon text: " + value);
+    if (value == "clear-day") {
+      value = "cday";
+    } else if (value == "clear-night") {
+      value = "cnight";
+    } else if (value == "partly-cloudy-day") {
+      value = "dpcloud";
+    } else if (value == "partly-cloudy-night") {
+      value = "npcloud";
+    }
+    Serial.println("Current icon text: " + value);
+    currentIcon = value;
+  }
   if (currentKey == "windspeedmph") {
     windSpeed = value;
   }
@@ -124,7 +139,6 @@ void WeatherClient::value(String value) {
     precipitationToday = value + "in";
   }
   if (currentKey == "sunriseTimeLocal") {
-    Serial.println("sunriseTime: " + value);
     sunriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
   }
   if (currentKey == "sunsetTimeLocal") {
@@ -132,21 +146,28 @@ void WeatherClient::value(String value) {
   }
   if (currentKey == "moonriseTimeLocal") {
       moonriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
-    }
+  }
   if (currentKey == "moonsetTimeLocal") {
       moonsetTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
-    }
+  }
   if (currentKey == "moonPhaseDay") {
     moonAge[currentForecastPeriod++] = value;
   }
   if (currentKey == "daypartName") {
     forecastTitle[currentForecastPeriod++] = value;
   }
+  if (currentKey == "dayOfWeek") {
+    forecastDayOfWeek[currentForecastPeriod++] = value;
+  }
 
   // Prevent currentForecastPeriod going out of bounds (shouldn't happen but...)
   if (currentForecastPeriod >= MAX_FORECAST_PERIODS) {
     currentForecastPeriod = MAX_FORECAST_PERIODS - 1;
   }
+}
+
+String WeatherClient::getCurrentIcon() {
+  return currentIcon;
 }
 
 String WeatherClient::getMoonAge() {
@@ -211,6 +232,10 @@ String WeatherClient::getForecastIcon(int period) {
 
 String WeatherClient::getForecastTitle(int period) {
   return forecastTitle[period];
+}
+
+String WeatherClient::getForecastDayOfWeek(int period) {
+  return forecastDayOfWeek[period];
 }
 
 String WeatherClient::getForecastLowTemp(int period) {
