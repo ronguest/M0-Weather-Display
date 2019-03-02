@@ -41,8 +41,8 @@ class WeatherClient: public JsonListener {
 
   public:
     WeatherClient(boolean foo);
-    void updateConditions(String device, String appKey, String apiKey, String dsApiKey, String dsLatLon);
-    void updateForecast(String postalKey, String apiKey);
+    void updateConditions(String device, String appKey, String apiKey);
+    void updateForecast(String postalKey, String apiKey, String dsApiKey, String dsLatLon);
 
     String getCurrentIcon();
     String getMoonAge();

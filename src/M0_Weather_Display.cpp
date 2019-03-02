@@ -135,11 +135,11 @@ void updateData() {
   local = usCT.toLocal(now(), &tcr);
   thisHour = hour(local);
 
-  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY, DS_API_KEY, DS_LAT_LON);
+  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
   // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
-    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
+    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY, DS_API_KEY, DS_LAT_LON);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {
@@ -276,8 +276,8 @@ void drawTime() {
 void drawCurrentWeather() {
   // Weather Icon
   String weatherIcon = weather.getCurrentIcon();
-//  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
-  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
+  // WU no longer provides a current weather icon
+//  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
   // Weather Text
   tft.setFont(&smallFont);
@@ -285,7 +285,7 @@ void drawCurrentWeather() {
   ui.setTextAlignment(RIGHT);
 //  ui.drawString(220, 40, weather.getWeatherText());
   //ui.drawString(220, 40, weather.getWeatherText());
-  ui.drawString(240, 80, weather.getWeatherText());
+  ui.drawString(240, 60, weather.getWeatherText());
 
   tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
@@ -294,7 +294,7 @@ void drawCurrentWeather() {
   String temp = weather.getCurrentTemp() + degreeSign;
   //ui.drawString(220, 70, temp);
 //  ui.drawString(220, 70, temp);
-  ui.drawString(240, 120, temp);
+  ui.drawString(200, 100, temp);
   //drawSeparator(135);
 }
 
