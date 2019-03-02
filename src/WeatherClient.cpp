@@ -12,10 +12,12 @@ WeatherClient::WeatherClient(boolean foo) {
 
 void WeatherClient::updateConditions(String device, String appKey, String apiKey, String dsApiKey, String dsLatLon) {
   doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
-  doUpdate(443, "api.darksky.net", "/forecast/" + dsApiKey + "/" + dsLatLon);
 }
 
 void WeatherClient::updateForecast(String postalKey, String apiKey) {
+  // Only using the current icon from Dark Sky. Not sure this is worth it as it is also leading to conflictss
+  // in the other JSON fields
+  doUpdate(443, "api.darksky.net", "/forecast/" + dsApiKey + "/" + dsLatLon);
   doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
