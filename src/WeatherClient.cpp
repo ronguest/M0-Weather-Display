@@ -99,6 +99,9 @@ void WeatherClient::value(String value) {
   if (currentKey == "temperatureMax") {
     if (!value.equalsIgnoreCase("null")) {
       forecastHighTemp[currentForecastPeriod++] = value;
+    } else {
+      // Just skip the null without recording it
+      currentForecastPeriod++;
     }
   }
   if (currentKey == "temperatureMin") {
@@ -109,15 +112,17 @@ void WeatherClient::value(String value) {
     // iconCode however is used as constant in a switch statement so worth converting here
     if (!value.equalsIgnoreCase("null")) {
       forecastIcon[currentForecastPeriod++] = value.toInt();
+    } else {
+      // Just skip the null without recording it
+      currentForecastPeriod++;
     }
   }
   if ((currentKey == "narrative") && (currentParent == "daypart")) {
-    if (currentForecastPeriod == 0) {
-      Serial.println("In narrative, currentParent is: " + currentParent);
-      Serial.println(value);
-    }
     if (!value.equalsIgnoreCase("null")) {
       fcttext[currentForecastPeriod++] = value;
+    } else {
+      // Just skip the null without recording it
+      currentForecastPeriod++;
     }
   }
   if (currentKey == "sunriseTimeLocal") {
@@ -136,7 +141,12 @@ void WeatherClient::value(String value) {
     moonAge[currentForecastPeriod++] = value;
   }
   if (currentKey == "daypartName") {
-    forecastTitle[currentForecastPeriod++] = value;
+    if (!value.equalsIgnoreCase("null")) {
+      forecastTitle[currentForecastPeriod++] = value;
+    } else {
+      // Just skip the null without recording it
+      currentForecastPeriod++;
+    }
   }
   if (currentKey == "dayOfWeek") {
     forecastDayOfWeek[currentForecastPeriod++] = value;

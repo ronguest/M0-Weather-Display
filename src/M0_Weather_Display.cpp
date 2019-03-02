@@ -308,9 +308,14 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 
   tft.setFont(&largeFont);
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex) + "|" + weather.getForecastHighTemp(dayIndex));
+  if ((hours >= 17) && (dayIndex == 0)) {
+    // Omit daytime high after 5pm
+    ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex));
+  } else {
+    ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex) + "|" + weather.getForecastHighTemp(dayIndex));
+  }
 
-  String weatherIcon = weather.getForecastIcon(dayIndex);
+  String weatherIcon = weather.getForecastIcon(hours >= 17 ? dayIndex+1 : dayIndex);   // Period 0 is daytime, add 1 is the night icon
   //ui.drawBmp("/Minis/" + weatherIcon + ".bmp", x, y + 15);
   //ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
