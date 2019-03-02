@@ -274,11 +274,6 @@ void drawTime() {
 
 // draws current weather information
 void drawCurrentWeather() {
-  // Weather Icon
-  String weatherIcon = weather.getCurrentIcon();
-  // WU no longer provides a current weather icon
-//  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
-
   tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
@@ -306,7 +301,7 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = weather.getForecastDayOfWeek( dayIndex).substring(0, 3);
+  String day = weather.getForecastDayOfWeek(dayIndex).substring(0, 3);
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 

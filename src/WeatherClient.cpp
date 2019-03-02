@@ -102,9 +102,6 @@ void WeatherClient::value(String value) {
     }
   }
   if (currentKey == "temperatureMin") {
-    if (currentForecastPeriod == 0) {
-      Serial.println("tempMin[0] = " + value);
-    }
     forecastLowTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "iconCode") {
@@ -114,7 +111,11 @@ void WeatherClient::value(String value) {
       forecastIcon[currentForecastPeriod++] = value.toInt();
     }
   }
-  if (currentKey == "narrative") {
+  if ((currentKey == "narrative") && (currentParent == "daypart")) {
+    if (currentForecastPeriod == 0) {
+      Serial.println("In narrative, currentParent is: " + currentParent);
+      Serial.println(value);
+    }
     if (!value.equalsIgnoreCase("null")) {
       fcttext[currentForecastPeriod++] = value;
     }
@@ -145,11 +146,6 @@ void WeatherClient::value(String value) {
   if (currentForecastPeriod >= MAX_FORECAST_PERIODS) {
     currentForecastPeriod = MAX_FORECAST_PERIODS - 1;
   }
-}
-
-String WeatherClient::getCurrentIcon() {
-  Serial.println("Returning currentIcon " + currentIcon);
-  return currentIcon;
 }
 
 String WeatherClient::getMoonAge() {
