@@ -11,7 +11,7 @@ WeatherClient::WeatherClient(boolean foo) {
 }
 
 void WeatherClient::updateConditions(String device, String appKey, String apiKey, String dsApiKey, String dsLatLon) {
-  doUpdate(80, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+  doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
   doUpdate(443, "api.darksky.net", "/forecast/" + dsApiKey + "/" + dsLatLon);
 }
 
@@ -29,9 +29,16 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   Serial.print("Connect to Server: "); Serial.println(server);
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
-  if (!client.connect(server, port)) {
-    Serial.println("connection failed");
-    return;
+  if (port != 443) {
+    if (!client.connect(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
+  } else {
+    if (!client.connectSSL(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
   }
 
   Serial.print("Requesting URL: "); Serial.println(server + url); Serial.flush();
@@ -85,6 +92,10 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
 void WeatherClient::value(String value) {
+  // timezone just one more check to see if getting Dark Sky data or not
+  if (currentKey == "timezone") {
+    Serial.println("timezone: " + value);
+  }
   if (currentKey == "icon") {
     Serial.println("Initial icon text: " + value);
     if (value == "clear-day") {
