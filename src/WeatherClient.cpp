@@ -97,18 +97,21 @@ void WeatherClient::value(String value) {
     Serial.println("timezone: " + value);
   }
   if (currentKey == "icon") {
-    Serial.println("Initial icon text: " + value);
-    if (value == "clear-day") {
-      value = "cday";
-    } else if (value == "clear-night") {
-      value = "cnight";
-    } else if (value == "partly-cloudy-day") {
-      value = "dpcloud";
-    } else if (value == "partly-cloudy-night") {
-      value = "npcloud";
+    // We only want the icon value from current conditions, supplied by Dark Sky
+    if (currentParent == "currently") {
+      //Serial.println("Initial icon text: " + value);
+      if (value == "clear-day") {
+        value = "cday";
+      } else if (value == "clear-night") {
+        value = "cnight";
+      } else if (value == "partly-cloudy-day") {
+        value = "dpcloud";
+      } else if (value == "partly-cloudy-night") {
+        value = "npcloud";
+      }
+      Serial.println("Current icon text: " + value);
+      currentIcon = value;
     }
-    Serial.println("Current icon text: " + value);
-    currentIcon = value;
   }
   if (currentKey == "windspeedmph") {
     windSpeed = value;
@@ -178,6 +181,7 @@ void WeatherClient::value(String value) {
 }
 
 String WeatherClient::getCurrentIcon() {
+  Serial.println("Returning currentIcon " + currentIcon);
   return currentIcon;
 }
 

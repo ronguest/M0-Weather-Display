@@ -275,7 +275,7 @@ void drawTime() {
 // draws current weather information
 void drawCurrentWeather() {
   // Weather Icon
-  String weatherIcon = weather.getTodayIcon();
+  String weatherIcon = weather.getCurrentIcon();
 //  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 0, 0);
   ui.drawBmp("/Icons/" + weatherIcon + ".bmp", 20, 50);
 
