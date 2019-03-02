@@ -314,7 +314,8 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = weather.getForecastDayOfWeek( dayIndex * 2).substring(0, 3); // evens are day time, odds are night time so * 2 to get next day
+  // evens are day time (0, 2, ...), odds are night time so * 2 to get next day rather than night
+  String day = weather.getForecastDayOfWeek( dayIndex * 2).substring(0, 3);
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 

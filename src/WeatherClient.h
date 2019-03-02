@@ -50,16 +50,10 @@ class WeatherClient: public JsonListener {
     String getSunsetTime();
     String getMoonriseTime();
     String getMoonsetTime();
-    String getWindSpeed();
-    String getWindDir();
     String getCurrentTemp();
     String getTodayIcon();
     String getMeteoconIcon(int iconCode);
     String getWeatherText();
-    String getHumidity();
-    String getPressure();
-    String getDewPoint();
-    String getPrecipitationToday();
     String getForecastIcon(int period);
     String getForecastTitle(int period);
     String getForecastDayOfWeek(int period);

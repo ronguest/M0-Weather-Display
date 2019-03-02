@@ -92,32 +92,20 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
 void WeatherClient::value(String value) {
-  // timezone just one more check to see if getting Dark Sky data or not
-  if (currentKey == "timezone") {
-    Serial.println("timezone: " + value);
-  }
-  if (currentKey == "icon") {
-    // We only want the icon value from current conditions, supplied by Dark Sky
-    if (currentParent == "currently") {
-      //Serial.println("Initial icon text: " + value);
-      if (value == "clear-day") {
-        value = "cday";
-      } else if (value == "clear-night") {
-        value = "cnight";
-      } else if (value == "partly-cloudy-day") {
-        value = "dpcloud";
-      } else if (value == "partly-cloudy-night") {
-        value = "npcloud";
-      }
-      Serial.println("Current icon text: " + value);
-      currentIcon = value;
+  // We only want the icon value from current conditions, supplied by Dark Sky
+  if ((currentKey == "icon") && (currentParent == "currently")) {
+    //Serial.println("Initial icon text: " + value);
+    if (value == "clear-day") {
+      value = "cday";
+    } else if (value == "clear-night") {
+      value = "cnight";
+    } else if (value == "partly-cloudy-day") {
+      value = "dpcloud";
+    } else if (value == "partly-cloudy-night") {
+      value = "npcloud";
     }
-  }
-  if (currentKey == "windspeedmph") {
-    windSpeed = value;
-  }
-  if (currentKey == "winddir") {
-    windDir = value;
+    Serial.println("Current icon text: " + value);
+    currentIcon = value;
   }
   if (currentKey == "tempf") {
     currentTemp = value;
@@ -128,29 +116,22 @@ void WeatherClient::value(String value) {
     }
   }
   if (currentKey == "temperatureMin") {
+    if (currentForecastPeriod == 0) {
+      Serial.println("tempMin[0] = " + value);
+    }
     forecastLowTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "iconCode") {
     // I mostly leave values as strings because we will display them
     // iconCode however is used as constant in a switch statement so worth converting here
-    forecastIcon[currentForecastPeriod++] = value.toInt();
+    if (!value.equalsIgnoreCase("null")) {
+      forecastIcon[currentForecastPeriod++] = value.toInt();
+    }
   }
   if (currentKey == "narrative") {
     if (!value.equalsIgnoreCase("null")) {
       fcttext[currentForecastPeriod++] = value;
     }
-  }
-  if (currentKey == "humidity") {
-    humidity = value;
-  }
-  if (currentKey == "baromrelin") {
-    pressure = value + "mb";
-  }
-  if (currentKey == "dewPoint") {
-    dewPoint = value;
-  }
-  if (currentKey == "dailyrainin") {
-    precipitationToday = value + "in";
   }
   if (currentKey == "sunriseTimeLocal") {
     sunriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
@@ -205,36 +186,12 @@ String WeatherClient::getMoonsetTime() {
   return moonsetTime[0];
  }
 
-String WeatherClient::getWindSpeed() {
-  return windSpeed;
- }
-
-String WeatherClient::getWindDir() {
-  return windDir;
- }
-
 String WeatherClient::getCurrentTemp() {
   return currentTemp;
 }
 
 String WeatherClient::getWeatherText() {
   return weatherText;
-}
-
-String WeatherClient::getHumidity() {
-  return humidity;
-}
-
-String WeatherClient::getPressure() {
-  return pressure;
-}
-
-String WeatherClient::getDewPoint() {
-  return dewPoint;
-}
-
-String WeatherClient::getPrecipitationToday() {
-  return precipitationToday;
 }
 
 String WeatherClient::getTodayIcon() {
