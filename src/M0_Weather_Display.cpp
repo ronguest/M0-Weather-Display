@@ -278,10 +278,11 @@ void drawCurrentWeather() {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
-  String temp = weather.getCurrentTemp() + degreeSign;
-  //ui.drawString(220, 70, temp);
-//  ui.drawString(220, 70, temp);
-  ui.drawString(200, 100, temp);
+  float f = weather.getCurrentTemp().toFloat();
+  f = f + 0.5f;
+  int temp = (int) f;
+  //String temp = weather.getCurrentTemp() + degreeSign;
+  ui.drawString(180, 100, String(f).substring(0,2) + degreeSign);
   //drawSeparator(135);
 }
 
