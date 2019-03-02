@@ -14,10 +14,9 @@ void WeatherClient::updateConditions(String device, String appKey, String apiKey
   doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
 }
 
-void WeatherClient::updateForecast(String postalKey, String apiKey, String dsApiKey, String dsLatLon) {
+void WeatherClient::updateForecast(String postalKey, String apiKey) {
   // Only using the current icon from Dark Sky. Not sure this is worth it as it is also leading to conflictss
   // in the other JSON fields
-  doUpdate(443, "api.darksky.net", "/forecast/" + dsApiKey + "/" + dsLatLon + "?exclude=minutely,hourly");
   doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
@@ -94,21 +93,6 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
 void WeatherClient::value(String value) {
-  // We only want the icon value from current conditions, supplied by Dark Sky
-  if ((currentKey == "icon") && (currentParent == "currently")) {
-    //Serial.println("Initial icon text: " + value);
-    if (value == "clear-day") {
-      value = "cday";
-    } else if (value == "clear-night") {
-      value = "cnight";
-    } else if (value == "partly-cloudy-day") {
-      value = "dpcloud";
-    } else if (value == "partly-cloudy-night") {
-      value = "npcloud";
-    }
-    Serial.println("Current icon text: " + value);
-    currentIcon = value;
-  }
   if (currentKey == "tempf") {
     currentTemp = value;
   }

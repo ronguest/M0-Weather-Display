@@ -139,7 +139,7 @@ void updateData() {
   // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
-    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY, DS_API_KEY, DS_LAT_LON);
+    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
     // Try an NTP time sync so we don't get too far off
     ntpTime = getNtpTime();
     if (ntpTime != 0) {
