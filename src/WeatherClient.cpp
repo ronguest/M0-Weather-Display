@@ -22,6 +22,9 @@ void WeatherClient::updateForecast(String postalKey, String apiKey) {
 
 void WeatherClient::doUpdate(int port, char server[], String url) {
   JsonStreamingParser parser;
+  // It might be better to have separate objects for each weather data source
+  // As it is now the same code is processing keywords from diverse sources leading to potential conflictss
+  // Currently this is handled by a bit of a kludge: checking the parent keyword to see if it also matches the desired feed
   parser.setListener(this);
   WiFiClient client;
   // Red LED output on the M0 Feather
