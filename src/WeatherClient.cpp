@@ -186,11 +186,20 @@ String WeatherClient::getCurrentTemp() {
 }
 
 String WeatherClient::getTodayIcon() {
-  return getMeteoconIcon(forecastIcon[0]);
+  int index = 0;
+  if (forecastIcon[index] == 0) {
+    // Got a null so return next entry, for tonight
+    index++;
+  }
+  return getMeteoconIcon(forecastIcon[index]);
 }
 
 String WeatherClient::getForecastIcon(int period) {
-  return getMeteoconIcon(forecastIcon[period]);
+  if (forecastIcon[period] == 0) {
+    return getMeteoconIcon(forecastIcon[period+1]);
+  } else {
+    return getMeteoconIcon(forecastIcon[period]);
+  }
 }
 
 String WeatherClient::getForecastTitle(int period) {
@@ -288,6 +297,10 @@ String WeatherClient::getMeteoconIcon(int iconCode) {
     return "hazy";
   case 22:
     return "hazy";
+  case 23:
+    return "hazy";
+  case 24:
+    return "hazy";
   case 25:
     return "sleet";
   case 26:
@@ -333,6 +346,7 @@ String WeatherClient::getMeteoconIcon(int iconCode) {
   case 47:
     return "tstorms";
   default:
+    Serial.println("Got icon code: " + iconCode);
     return "unknown";
   }
 }
