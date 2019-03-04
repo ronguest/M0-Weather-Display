@@ -31,19 +31,12 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   Serial.print("Connect to Server: "); Serial.println(server);
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
-  if (port != 443) {
-    if (!client.connect(server, port)) {
-      Serial.println("connection failed");
-      return;
-    }
-  } else {
-    if (!client.connectSSL(server, port)) {
-      Serial.println("connection failed");
-      return;
-    }
+
+  if (!client.connect(server, port)) {
+    Serial.println("connection failed");
+    return;
   }
 
-  Serial.print("Requesting URL: "); Serial.println(server + url); Serial.flush();
   // This will send the request to the server
   client.print(String("GET ") + url + " HTTP/1.1\r\n" +
                "Host: " + server + "\r\n" +
@@ -67,7 +60,6 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   while(client.connected()) {
     while((size = client.available()) > 0) {
       c = client.read();
-      //Serial.print(c);
       if (c == '{' || c == '[') {
         isBody = true;
       }
@@ -92,11 +84,11 @@ void WeatherClient::key(String key) {
 // There is a bounds check at the end of the function.
 // If a value = "null" for several of the below we ignore those due to how the Wunderground feed works
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
-
 void WeatherClient::value(String value) {
   if (currentKey == "tempf") {        // Only thing we take from Ambient Weather
     currentTemp = value;
   }
+
   if (currentKey == "temperatureMax") {
     forecastHighTemp[currentForecastPeriod++] = value;
   }
@@ -104,10 +96,11 @@ void WeatherClient::value(String value) {
     forecastLowTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "iconCode") {
-    // I mostly leave values as strings because we will display them
+    // I leave values as strings because we will display them
     // iconCode however is used as constant in a switch statement so worth converting here
     forecastIcon[currentForecastPeriod++] = value.toInt();
   }
+  // There are two "narrative" arrays from WU, one is day of week the other is day + night, we want day + night
   if ((currentKey == "narrative") && (currentParent == "daypart")) {
     forecastText[currentForecastPeriod++] = value;
   }
@@ -243,11 +236,15 @@ void WeatherClient::endObject() {
 
 // Converts the WU icon code to the file name for the M0
 String WeatherClient::getMeteoconIcon(int iconCode) {
-  switch (iconCode){
+  switch (iconCode) {
+  case 0:
+    return "hazy";      // this is really a tornado
   case 3:
     return "tstorms";
   case 4:
     return "tstorms";
+  case 5:
+    return "snow";
   case 6:
     return "sleet";
   case 7:
