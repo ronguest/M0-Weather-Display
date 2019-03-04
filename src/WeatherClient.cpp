@@ -32,9 +32,16 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
 
-  if (!client.connect(server, port)) {
-    Serial.println("connection failed");
-    return;
+  if (port == 443) {
+    if (!client.connectSSL(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
+  } else {
+    if (!client.connect(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
   }
 
   // This will send the request to the server
