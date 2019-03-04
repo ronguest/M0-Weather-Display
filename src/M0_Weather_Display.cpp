@@ -26,14 +26,12 @@ void downloadResources();
 void updateData();
 void showOverview();
 void showForecastDetail();
-void drawForecastText(int y, String text, int maxlines);
+int drawForecastText(int y, String text, int maxlines);
 void drawCurrentWeather();
 void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String high, String icon);
 void drawForecast();
 void drawAstronomy();
-void drawProgress(uint8_t percentage, String text);
 void drawTime();
-void drawSeparator(uint16_t y);
 void sleepNow(int wakeup);
 time_t getNtpTime();
 void sendNTPpacket(IPAddress&);
@@ -46,7 +44,7 @@ void setup(void) {
   Serial.begin(115200);
   delay(1000);
 
-  //Configure pins for Adafruit ATWINC1500 Feather
+  //Configure pins for Adafruit M0 ATWINC1500 Feather
   WiFi.setPins(8,7,4,2);
 
   pinMode(ledPin, OUTPUT);
@@ -93,8 +91,6 @@ void setup(void) {
 
   // Get current time using NTP
   Udp.begin(localPort);
-  //setSyncProvider(getNtpTime);    // getNtpTime() connects to NTP server
-  //setSyncInterval(300);           // 300 is in seconds, so sync time every 5 minutes
   ntpTime = getNtpTime();
   if (ntpTime != 0) {
     setTime(ntpTime);
@@ -102,7 +98,7 @@ void setup(void) {
     Serial.println("Failed to set the initial time");
   }
 
-  currentHour = -1;
+  currentHour = -1;     // Causes an immediate update to weather data on startup
 }
 
 void loop() {
@@ -149,13 +145,13 @@ void updateData() {
   showOverview();
 }
 
+// Makes calls to paint the first screen
 void showOverview() {
   tft.fillScreen(WX_BLACK);
-  tft.setFont(&smallFont);
 
   drawTime();
   drawCurrentWeather();
-  todayDetail(130);
+  todayDetail(130);       // Parameter is y coordinate to start forecast text
   drawForecast();
   drawAstronomy();
 }
@@ -177,7 +173,7 @@ void todayDetail(int baseline) {
   drawForecastText(baseline, text, maxLines);
 }
 
-void drawForecastText(int y, String text, int maxLines) {
+int drawForecastText(int y, String text, int maxLines) {
   int textLength;
   int finalSpace;
   int startPoint = 0;   // Position in text of next character to print
@@ -205,15 +201,16 @@ void drawForecastText(int y, String text, int maxLines) {
     //Serial.print("Start point: ");Serial.println(startPoint);
     maxLines--;
   }
+  return y;
 }
 
 // On second page, draw today's AM, PM and tomorrow's AM, PM forecast text
 void showForecastDetail() {
   int textLength;
   String text;
+  int maxLines = 7;
   int y = 30;
   int period;
-  int finalSpace;
 
   tft.fillScreen(WX_BLACK);
   tft.setFont(&smallFont);
@@ -254,25 +251,8 @@ void showForecastDetail() {
     }
     ui.drawString(0, y, title);
     y += lineSize;
-    int startPoint = 0;   // Position in text of next character to print
-    while (startPoint < textLength) {
-      // Find the last space in the next string we will print
-      finalSpace = text.lastIndexOf(' ', startPoint + maxPerLine);
-      if (finalSpace == -1 ) {
-        // It's possible the final substring doesn't have a space
-        finalSpace = textLength;
-      }
-      //Serial.print("Final space: ");Serial.println(finalSpace);
-      // If the first character is a space, skip it (happens due to line wrapping)
-      if (text.indexOf(' ', startPoint) == startPoint) {
-        startPoint++;
-      }
-      ui.drawString(10, y, text.substring(startPoint, finalSpace));
-      y += lineSize;
-      startPoint = finalSpace;
-      //Serial.print("Start point: ");Serial.println(startPoint);
-    }
-    y += lineSize;    // Add extra space between periods
+    y = drawForecastText(y, text, maxLines);
+    y += lineSize;    // Add extra space between forecasts
   }
 }
 
@@ -291,15 +271,12 @@ void drawTime() {
   ui.drawString(150, 20, dateS);
 
   String ampm = "am";
-  //tft.setFont(&largeFont);
   if (hours >= 12) {
     hours = (hours > 12) ? hours - 12 : hours;
     ampm = "pm";
   }
   String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
-  //ui.drawString(120, 56, timeS);
   ui.drawString(150, 40, timeS);
-  //drawSeparator(65);
 }
 
 // draws current weather information -- which is just the current temperature
@@ -311,9 +288,7 @@ void drawCurrentWeather() {
   float f = weather.getCurrentTemp().toFloat();
   f = f + 0.5f;
   int temp = (int) f;
-  //String temp = weather.getCurrentTemp() + degreeSign;
   ui.drawString(180, 100, String(f).substring(0,2) + degreeSign);
-  //drawSeparator(135);
 }
 
 // On first page draw hi, lo and icon for today and tomorrow
@@ -329,7 +304,6 @@ void drawForecast() {
   drawForecastDetail(30, drop, weather.getTodayName(), weather.getTodayForecastLow(), weather.getTodayForecastHigh(), icon);
 
   drawForecastDetail(200, drop, weather.getTomorrowName(), weather.getTomorrowForecastLow(), weather.getTomorrowForecastHigh(), weather.getTomorrowIcon());
-  //drawSeparator(drop + 65 + 10);
 }
 
 // helper for the forecast columns
@@ -355,10 +329,8 @@ void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String h
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
-  //int moonAgeImage = 24 * weather.getMoonAge().toInt();
   int baseline = 410;   // Place at the bottom
   int baseX = 20;
-//  ui.drawBmp("/Moon/" + String(moonAgeImage) + ".bmp", 120 - 30, baseline);
   String moonFile;
 
   moonFile = "/Moon/" + weather.getMoonAge() + ".bmp";
@@ -381,20 +353,6 @@ void drawAstronomy() {
   ui.drawString(baseX+280, baseline+43, weather.getMoonriseTime());
   ui.drawString(baseX+280, baseline+60, weather.getMoonsetTime());
 
-}
-
-// Progress bar helper
-void drawProgress(uint8_t percentage, String text) {
-  ui.setTextAlignment(CENTER);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  tft.fillRect(0, 140, 240, 45, WX_BLACK);
-  ui.drawString(120, 160, text);
-  ui.drawProgressBar(10, 165, 240 - 20, 15, percentage, WX_WHITE, WX_BLUE);
-}
-
-// if you want separators, uncomment the tft-line
-void drawSeparator(uint16_t y) {
-   //tft.drawFastHLine(10, y, 240 - 2 * 10, 0x4228);
 }
 
 time_t getNtpTime() {
