@@ -53,7 +53,6 @@ class GfxUi {
     void setTextColor(uint16_t c, uint16_t bg);
     void setTextSize(uint16_t x);
     void drawBmp(String filename, uint16_t x, uint16_t y);
-    void drawProgressBar(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t percentage, uint16_t frameColor, uint16_t barColor);
 
   private:
   #ifdef HX8357

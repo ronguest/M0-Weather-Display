@@ -79,17 +79,6 @@ void GfxUi::setTextAlignment(TextAlignment alignment) {
   _alignment = alignment;
 }
 
-void GfxUi::drawProgressBar(uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, uint8_t percentage, uint16_t frameColor, uint16_t barColor) {
-  if (percentage == 0) {
-    _tft->fillRoundRect(x0, y0, w, h, 3, _backgroundColor);
-  }
-  uint8_t margin = 2;
-  uint16_t barHeight = h - 2 * margin;
-  uint16_t barWidth = w - 2 * margin;
-  _tft->drawRoundRect(x0, y0, w, h, 3, frameColor);
-  _tft->fillRect(x0 + margin, y0 + margin, barWidth * percentage / 100.0, barHeight, barColor);
-}
-
 void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
   File     bmpFile;
   int      bmpWidth, bmpHeight;   // W+H in pixels
@@ -124,12 +113,14 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
 
   // Parse BMP header
   if(read16(bmpFile) == 0x4D42) { // BMP signature
-    Serial.print(F("File size: ")); Serial.println(read32(bmpFile));
+    int fileSize = (read32(bmpFile));
+    //Serial.print(F("File size: ")); Serial.println(fileSize);
     (void)read32(bmpFile); // Read & ignore creator bytes
     bmpImageoffset = read32(bmpFile); // Start of image data
     //Serial.print(F("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
     // Read DIB header
-    Serial.print(F("Header size: ")); Serial.println(read32(bmpFile));
+    int headerSize = read32(bmpFile);
+    //Serial.print(F("Header size: ")); Serial.println(headerSize);
     bmpWidth  = read32(bmpFile);
     bmpHeight = read32(bmpFile);
     if(read16(bmpFile) == 1) { // # planes -- must be '1'
