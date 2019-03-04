@@ -26,6 +26,7 @@ void downloadResources();
 void updateData();
 void showOverview();
 void showForecastDetail();
+void drawForecastText(int y, String text, int maxlines);
 void drawCurrentWeather();
 void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String high, String icon);
 void drawForecast();
@@ -116,17 +117,15 @@ void loop() {
   if (ts.touched()) {
     showForecastText = !showForecastText;
     if (showForecastText) {
-      // Show forecast text details in place of overview
       showForecastDetail();
     } else {
-      // Switch back to default overview
       showOverview();
     }
   }
   delay(100);
 }
 
-// Update the internet based information and update screen
+// Download latest weather data and update screen
 void updateData() {
   time_t local;
   time_t ntpTime;
@@ -146,8 +145,6 @@ void updateData() {
       setTime(ntpTime);
     }
   }
-  //lastUpdate = timeClient.getFormattedTime();
-  //readyForWeatherUpdate = false;
 
   showOverview();
 }
@@ -165,27 +162,32 @@ void showOverview() {
 
 // On first page draw today's forecast
 void todayDetail(int baseline) {
-  int textLength;
   String text;
   int maxLines = 5;
+
+  local = usCT.toLocal(now(), &tcr);
+  hours = hour(local);
+
+  text = weather.getTodayForecastTextAM();
+  // Recently WU starting sending "null" for today's AM forecast text starting at 3pm local
+  if (text == "null") {
+    text = weather.getTodayForecastTextPM();
+  }
+
+  drawForecastText(baseline, text, maxLines);
+}
+
+void drawForecastText(int y, String text, int maxLines) {
+  int textLength;
   int finalSpace;
   int startPoint = 0;   // Position in text of next character to print
 
   tft.setFont(&smallFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
-  local = usCT.toLocal(now(), &tcr);
-  hours = hour(local);
-
-  int y = baseline;
-  text = weather.getTodayForecastTextAM();
-  // Recently WU starting sending "null" for today's AM forecast text starting at 3pm local
-  if (text == "null") {
-    text = weather.getTodayForecastTextPM();
-  }
   textLength = text.length();
-  //Serial.print("Today detail length: "); Serial.println(textLength);
-  while ((startPoint < textLength) && (maxLines > 0)){
+
+  while ((startPoint < textLength) && (maxLines > 0)) {
     // Find the last space in the next string we will print
     finalSpace = text.lastIndexOf(' ', startPoint + maxPerLine);
     if (finalSpace == -1 ) {
