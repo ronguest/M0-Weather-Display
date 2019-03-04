@@ -164,10 +164,10 @@ String WeatherClient::getTomorrowForecastHigh() {
   return forecastHighTemp[1];
 }
 String WeatherClient::getTodayForecastLow() {
-  return forecastHighTemp[0];
+  return forecastLowTemp[0];
 }
 String WeatherClient::getTomorrowForecastLow() {
-  return forecastHighTemp[1];
+  return forecastLowTemp[1];
 }
 
 // Forecast text getters
