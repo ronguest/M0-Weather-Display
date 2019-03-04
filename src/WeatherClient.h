@@ -18,11 +18,10 @@ class WeatherClient: public JsonListener {
     String currentTemp;
     int currentForecastPeriod;
     int forecastIcon [MAX_FORECAST_PERIODS];
-    String forecastTitle [MAX_FORECAST_PERIODS];        // 2 per day
     String forecastDayOfWeek [MAX_FORECAST_PERIODS];    // 1 per calendar day, up to 6
     String forecastLowTemp [MAX_FORECAST_PERIODS];      // For high & low WU provides one value per calendar day, currently returns 6
     String forecastHighTemp [MAX_FORECAST_PERIODS];     // For high & low WU provides one value per calendar day, currently returns 6
-    String fcttext [MAX_FORECAST_PERIODS];              // WU provides a narrative for a day as well as 12 hour periods. We use Night & Day so 12 entries
+    String forecastText [MAX_FORECAST_PERIODS];              // WU provides a narrative for a day as well as 12 hour periods. We use Night & Day so 12 entries
     String moonAge[MAX_FORECAST_PERIODS];               // WU provides 1 per calendar day
     String sunriseTime[MAX_FORECAST_PERIODS];           // WU provides 1 per calendar day
     String sunsetTime[MAX_FORECAST_PERIODS];            // WU provides 1 per calendar day
@@ -35,7 +34,6 @@ class WeatherClient: public JsonListener {
     void updateConditions(String device, String appKey, String apiKey);
     void updateForecast(String postalKey, String apiKey);
 
-    String getCurrentIcon();
     String getMoonAge();
     String getSunriseTime();
     String getSunsetTime();
@@ -43,13 +41,22 @@ class WeatherClient: public JsonListener {
     String getMoonsetTime();
     String getCurrentTemp();
     String getTodayIcon();
-    String getMeteoconIcon(int iconCode);
-    String getForecastIcon(int period);
-    String getForecastTitle(int period);
+    String getTonightIcon();
+    String getTomorrowIcon();
+    String getTomorrowNightIcon();
+    String getTodayName();
+    String getTomorrowName();
+    String getTodayForecastHigh();
+    String getTodayForecastLow();
+    String getTomorrowForecastHigh();
+    String getTomorrowForecastLow();
+    String getTodayForecastTextAM();
+    String getTodayForecastTextPM();
+    String getTomorrowForecastTextAM();
+    String getTomorrowForecastTextPM();
     String getForecastDayOfWeek(int period);
-    String getForecastLowTemp(int period);
-    String getForecastHighTemp(int period);
-    String getForecastText(int period);
+    String getMeteoconIcon(int iconCode);
+    
     virtual void whitespace(char c);
     virtual void startDocument();
     virtual void key(String key);

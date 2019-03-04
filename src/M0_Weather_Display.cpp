@@ -27,7 +27,7 @@ void updateData();
 void showOverview();
 void showForecastDetail();
 void drawCurrentWeather();
-void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex);
+void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String high, String icon);
 void drawForecast();
 void drawAstronomy();
 void drawProgress(uint8_t percentage, String text);
@@ -163,6 +163,7 @@ void showOverview() {
   drawAstronomy();
 }
 
+// On first page draw today's forecast
 void todayDetail(int baseline) {
   int textLength;
   String text;
@@ -177,10 +178,13 @@ void todayDetail(int baseline) {
   hours = hour(local);
 
   int y = baseline;
-  // Starting at 5pm show the forecast for the evening/night instead of the daytime forecast
-  text = weather.getForecastText(hours >= 17 ? 1 : 0);   // Period 0 is daytime, period 1 is the night forecast
+  text = weather.getTodayForecastTextAM();
+  // Recently WU starting sending "null" for today's AM forecast text starting at 3pm local
+  if (text == "null") {
+    text = weather.getTodayForecastTextPM();
+  }
   textLength = text.length();
-  Serial.print("Today detail length: "); Serial.println(textLength);
+  //Serial.print("Today detail length: "); Serial.println(textLength);
   while ((startPoint < textLength) && (maxLines > 0)){
     // Find the last space in the next string we will print
     finalSpace = text.lastIndexOf(' ', startPoint + maxPerLine);
@@ -188,7 +192,7 @@ void todayDetail(int baseline) {
       // It's possible the final substring doesn't have a space
       finalSpace = textLength;
     }
-    Serial.print("Final space: ");Serial.println(finalSpace);
+    //Serial.print("Final space: ");Serial.println(finalSpace);
     // If the first character is a space, skip it (happens due to line wrapping)
     if (text.indexOf(' ', startPoint) == startPoint) {
       startPoint++;
@@ -196,11 +200,12 @@ void todayDetail(int baseline) {
     ui.drawString(10, y, text.substring(startPoint, finalSpace));
     y += lineSize;
     startPoint = finalSpace;
-    Serial.print("Start point: ");Serial.println(startPoint);
+    //Serial.print("Start point: ");Serial.println(startPoint);
     maxLines--;
   }
 }
 
+// On second page, draw today's AM, PM and tomorrow's AM, PM forecast text
 void showForecastDetail() {
   int textLength;
   String text;
@@ -213,16 +218,39 @@ void showForecastDetail() {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   ui.setTextAlignment(LEFT);
 
-  // We show 4 periods which is 2 days + 2 nights
+  // We show up to 4 periods which is 2 days + 2 nights
   for (period=0; period<4; period++) {
     //Serial.print("period: ");Serial.println(period);
-    text = weather.getForecastText(period);
+    switch (period) {
+      case 0:
+        text = weather.getTodayForecastTextAM();
+        if (text == "null") {
+          // Skip today if null
+          continue;
+        }
+        break;
+      case 1:
+        text = weather.getTodayForecastTextPM();
+        break;
+      case 2:
+        text = weather.getTomorrowForecastTextAM();
+        break;
+      case 3:
+        text = weather.getTomorrowForecastTextPM();
+        break;
+      default:
+        return;
+    }
     //Serial.print("forecast text: ");Serial.println(text);
     textLength = text.length();
-    Serial.print("Forecast length: "); Serial.println(textLength);
+    //Serial.print("Forecast length: "); Serial.println(textLength);
 
     // Draw the name of the period (e.g. "Monday" or "Monday Night")
-    ui.drawString(0, y, weather.getForecastTitle(period));
+    String title = (period < 2) ? weather.getTodayName() : weather.getTomorrowName();
+    if ((period == 1 || period == 3)) {
+      title = title + " " + "night";
+    }
+    ui.drawString(0, y, title);
     y += lineSize;
     int startPoint = 0;   // Position in text of next character to print
     while (startPoint < textLength) {
@@ -232,7 +260,7 @@ void showForecastDetail() {
         // It's possible the final substring doesn't have a space
         finalSpace = textLength;
       }
-      Serial.print("Final space: ");Serial.println(finalSpace);
+      //Serial.print("Final space: ");Serial.println(finalSpace);
       // If the first character is a space, skip it (happens due to line wrapping)
       if (text.indexOf(' ', startPoint) == startPoint) {
         startPoint++;
@@ -240,13 +268,13 @@ void showForecastDetail() {
       ui.drawString(10, y, text.substring(startPoint, finalSpace));
       y += lineSize;
       startPoint = finalSpace;
-      Serial.print("Start point: ");Serial.println(startPoint);
+      //Serial.print("Start point: ");Serial.println(startPoint);
     }
     y += lineSize;    // Add extra space between periods
   }
 }
 
-// Draws date and time
+// Draws date and time at top of display
 void drawTime() {
   local = usCT.toLocal(now(), &tcr);
   hours = hour(local);
@@ -272,7 +300,7 @@ void drawTime() {
   //drawSeparator(65);
 }
 
-// draws current weather information
+// draws current weather information -- which is just the current temperature
 void drawCurrentWeather() {
   tft.setFont(&largeFont);
   ui.setTextColor(WX_CYAN, WX_BLACK);
@@ -286,39 +314,41 @@ void drawCurrentWeather() {
   //drawSeparator(135);
 }
 
-// draws the three forecast columns
+// On first page draw hi, lo and icon for today and tomorrow
 void drawForecast() {
-  //const int drop = 140;
   const int drop = 260;
-//  drawForecastDetail(10, drop, 0);
-//  drawForecastDetail(130, drop, 2);
-  drawForecastDetail(30, drop, 0);
-  drawForecastDetail(200, drop, 1);
+  String icon;
+
+  // Handle WU returning null starting at 3pm
+  icon = weather.getTodayIcon();
+  if (icon == "null") {
+    icon = weather.getTonightIcon();
+  }
+  drawForecastDetail(30, drop, weather.getTodayName(), weather.getTodayForecastLow(), weather.getTodayForecastHigh(), icon);
+
+  drawForecastDetail(200, drop, weather.getTomorrowName(), weather.getTomorrowForecastLow(), weather.getTomorrowForecastHigh(), weather.getTomorrowIcon());
   //drawSeparator(drop + 65 + 10);
 }
 
 // helper for the forecast columns
-void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
+void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String high, String icon) {
   ui.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
   ui.setTextAlignment(CENTER);
-  String day = weather.getForecastDayOfWeek(dayIndex).substring(0, 3);
+  day = day.substring(0, 3);
   day.toUpperCase();
   ui.drawString(x + 45, y, day);
 
   tft.setFont(&largeFont);
   ui.setTextColor(WX_WHITE, WX_BLACK);
-  if ((hours >= 17) && (dayIndex == 0)) {
-    // Omit daytime high after 5pm
-    ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex));
+  if (high == "null") {
+    // Omit daytime high if null from WU
+    ui.drawString(x + 40, y + 40, low);
   } else {
-    ui.drawString(x + 40, y + 40, weather.getForecastLowTemp(dayIndex) + "|" + weather.getForecastHighTemp(dayIndex));
+    ui.drawString(x + 40, y + 40, low + "|" + high);
   }
 
-  String weatherIcon = weather.getForecastIcon(hours >= 17 ? dayIndex+1 : dayIndex);   // Period 0 is daytime, add 1 is the night icon
-  //ui.drawBmp("/Minis/" + weatherIcon + ".bmp", x, y + 15);
-  //ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
-  ui.drawBmp("/Icons/" + weatherIcon + ".bmp", x+0, y + 40);
+  ui.drawBmp("/Icons/" + icon + ".bmp", x+0, y + 40);
 }
 
 // draw moonphase and sunrise/set and moonrise/set

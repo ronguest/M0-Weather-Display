@@ -96,16 +96,11 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 
 void WeatherClient::value(String value) {
-  if (currentKey == "tempf") {
+  if (currentKey == "tempf") {        // Only thing we take from Ambient Weather
     currentTemp = value;
   }
   if (currentKey == "temperatureMax") {
-    if (!value.equalsIgnoreCase("null")) {
-      forecastHighTemp[currentForecastPeriod++] = value;
-    } else {
-      // Just skip the null without recording it
-      currentForecastPeriod++;
-    }
+    forecastHighTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "temperatureMin") {
     forecastLowTemp[currentForecastPeriod++] = value;
@@ -113,20 +108,10 @@ void WeatherClient::value(String value) {
   if (currentKey == "iconCode") {
     // I mostly leave values as strings because we will display them
     // iconCode however is used as constant in a switch statement so worth converting here
-    if (!value.equalsIgnoreCase("null")) {
-      forecastIcon[currentForecastPeriod++] = value.toInt();
-    } else {
-      // Just skip the null without recording it
-      currentForecastPeriod++;
-    }
+    forecastIcon[currentForecastPeriod++] = value.toInt();
   }
   if ((currentKey == "narrative") && (currentParent == "daypart")) {
-    if (!value.equalsIgnoreCase("null")) {
-      fcttext[currentForecastPeriod++] = value;
-    } else {
-      // Just skip the null without recording it
-      currentForecastPeriod++;
-    }
+    forecastText[currentForecastPeriod++] = value;
   }
   if (currentKey == "sunriseTimeLocal") {
     sunriseTime[currentForecastPeriod++] = value.substring(value.indexOf('T')+1,value.lastIndexOf(':'));
@@ -143,14 +128,6 @@ void WeatherClient::value(String value) {
   if (currentKey == "moonPhaseDay") {
     moonAge[currentForecastPeriod++] = value;
   }
-  if (currentKey == "daypartName") {
-    if (!value.equalsIgnoreCase("null")) {
-      forecastTitle[currentForecastPeriod++] = value;
-    } else {
-      // Just skip the null without recording it
-      currentForecastPeriod++;
-    }
-  }
   if (currentKey == "dayOfWeek") {
     forecastDayOfWeek[currentForecastPeriod++] = value;
   }
@@ -161,65 +138,75 @@ void WeatherClient::value(String value) {
   }
 }
 
-String WeatherClient::getMoonAge() {
-  return moonAge[0];
-}
-
-String WeatherClient::getSunriseTime() {
-  return sunriseTime[0];
- }
-
-String WeatherClient::getSunsetTime() {
-  return sunsetTime[0];
- }
-
-String WeatherClient::getMoonriseTime() {
-  return moonriseTime[0];
- }
-
-String WeatherClient::getMoonsetTime() {
-  return moonsetTime[0];
- }
-
 String WeatherClient::getCurrentTemp() {
   return currentTemp;
 }
 
+// Icon getters
 String WeatherClient::getTodayIcon() {
-  int index = 0;
-  if (forecastIcon[index] == 0) {
-    // Got a null so return next entry, for tonight
-    index++;
-  }
-  return getMeteoconIcon(forecastIcon[index]);
+  return getMeteoconIcon(forecastIcon[0]);
+}
+String WeatherClient::getTonightIcon() {
+  return getMeteoconIcon(forecastIcon[1]);
+}
+String WeatherClient::getTomorrowIcon() {
+  return getMeteoconIcon(forecastIcon[2]);
+}
+String WeatherClient::getTomorrowNightIcon() {
+  return getMeteoconIcon(forecastIcon[3]);
 }
 
-String WeatherClient::getForecastIcon(int period) {
-  if (forecastIcon[period] == 0) {
-    return getMeteoconIcon(forecastIcon[period+1]);
-  } else {
-    return getMeteoconIcon(forecastIcon[period]);
-  }
+// High/Low getters
+String WeatherClient::getTodayForecastHigh() {
+  return forecastHighTemp[0];
+}
+String WeatherClient::getTomorrowForecastHigh() {
+  return forecastHighTemp[1];
+}
+String WeatherClient::getTodayForecastLow() {
+  return forecastHighTemp[0];
+}
+String WeatherClient::getTomorrowForecastLow() {
+  return forecastHighTemp[1];
 }
 
-String WeatherClient::getForecastTitle(int period) {
-  return forecastTitle[period];
+// Forecast text getters
+String WeatherClient::getTodayForecastTextAM() {
+  return forecastText[0];
+}
+String WeatherClient::getTodayForecastTextPM() {
+  return forecastText[1];
+}
+String WeatherClient::getTomorrowForecastTextAM() {
+  return forecastText[2];
+}
+String WeatherClient::getTomorrowForecastTextPM() {
+  return forecastText[3];
 }
 
-String WeatherClient::getForecastDayOfWeek(int period) {
-  return forecastDayOfWeek[period];
+// Day of week names (Mon, Tue, etc)
+String WeatherClient::getTodayName() {
+  return forecastDayOfWeek[0];
+}
+String WeatherClient::getTomorrowName() {
+  return forecastDayOfWeek[1];
 }
 
-String WeatherClient::getForecastLowTemp(int period) {
-  return forecastLowTemp[period];
+// Sun and Moon times
+String WeatherClient::getMoonAge() {
+  return moonAge[0];
 }
-
-String WeatherClient::getForecastHighTemp(int period) {
-  return forecastHighTemp[period];
+String WeatherClient::getSunriseTime() {
+  return sunriseTime[0];
 }
-
-String WeatherClient::getForecastText(int period) {
-  return fcttext[period];
+String WeatherClient::getSunsetTime() {
+  return sunsetTime[0];
+}
+String WeatherClient::getMoonriseTime() {
+  return moonriseTime[0];
+}
+String WeatherClient::getMoonsetTime() {
+  return moonsetTime[0];
 }
 
 void WeatherClient::whitespace(char c) {
