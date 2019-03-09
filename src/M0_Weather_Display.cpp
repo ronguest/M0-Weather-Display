@@ -14,7 +14,6 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 #endif
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
-WiFiUDP Udp;
 WeatherClient weather(true);
 
 //declaring prototypes
@@ -32,8 +31,6 @@ void drawForecast();
 void drawAstronomy();
 void drawTime();
 void sleepNow(int wakeup);
-time_t getNtpTime();
-void sendNTPpacket(IPAddress&);
 void todayDetail(int baseline);
 
 long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
@@ -61,21 +58,13 @@ void setup(void) {
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 
-  //Configure pins for Adafruit M0 ATWINC1500 Feather
-  WiFi.setPins(8,7,4,2);
-
-  // check for the presence of the shield:
-  /*if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println(F("No Wifi"));
-    // don't continue
-    while (true) delay(1000);
-  }*/
+  weather.init();
 
   tft.begin();
   tft.setRotation(2);
   tft.fillScreen(WX_BLACK);
   tft.setFont(&smallFont);
-  tft.setTextColor(WX_CYAN, WX_BLACK);
+  tft.setTextColor(WX_WHITE, WX_BLACK);
   //tft.setTextAlignment(CENTER);
 
   if (!ts.begin()) {
@@ -84,19 +73,6 @@ void setup(void) {
   }
   Serial.println("Touchscreen started");
 
-  // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) {
-    Serial.print(F("Wifi connect to: ")); Serial.println(ssid);
-    status = WiFi.begin(ssid, pass);
-    // wait 10 seconds for connection
-    delay(5000);
-  }
-
-  delay(10000);
-  tft.fillScreen(WX_BLUE);
-  Serial.println("Stopping in Setup");
-  while (1) delay(1000);
-
   // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
   if (!SD.begin(SD_CS)) {
@@ -104,14 +80,10 @@ void setup(void) {
   }
   Serial.println("SD OK!");
 
-  // Get current time using NTP
-  Udp.begin(localPort);
-  ntpTime = getNtpTime();
-  if (ntpTime != 0) {
-    setTime(ntpTime);
-  } else {
-    Serial.println("Failed to set the initial time");
-  }
+  delay(5000);
+  tft.fillScreen(WX_BLUE);
+  Serial.println("Stopping in Setup");
+  while (1) delay(1000);
 
   currentHour = -1;     // Causes an immediate update to weather data on startup
 }
@@ -146,19 +118,14 @@ void updateData() {
   time_t ntpTime;
   int thisHour;
 
-  local = usCT.toLocal(now(), &tcr);
-  thisHour = hour(local);
+  //local = usCT.toLocal(now(), &tcr);
+  //thisHour = hour(local);
 
   weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
   // We only update the Forecast once an hour. They don't change much
   if (thisHour != currentHour) {
     currentHour = thisHour;
     weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
-    // Try an NTP time sync so we don't get too far off
-    ntpTime = getNtpTime();
-    if (ntpTime != 0) {
-      setTime(ntpTime);
-    }
   }
 
   showOverview();
@@ -180,8 +147,8 @@ void todayDetail(int baseline) {
   String text;
   int maxLines = 5;
 
-  local = usCT.toLocal(now(), &tcr);
-  hours = hour(local);
+  //local = usCT.toLocal(now(), &tcr);
+  //hours = hour(local);
 
   text = weather.getTodayForecastTextAM();
   // Recently WU starting sending "null" for today's AM forecast text starting at 3pm local
@@ -277,16 +244,16 @@ void showForecastDetail() {
 
 // Draws date and time at top of display
 void drawTime() {
-  local = usCT.toLocal(now(), &tcr);
+/*  local = usCT.toLocal(now(), &tcr);
   hours = hour(local);
   minutes = minute(local);
   dayOfWeek = weekday(local);
-
+*/
   //ui.setTextAlignment(CENTER);
   tft.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);
 
-  String dateS = String(dayStr(dayOfWeek)) + ", " + String(monthStr(month(local))) + " " + String(day(local));
+  /*String dateS = String(dayStr(dayOfWeek)) + ", " + String(monthStr(month(local))) + " " + String(day(local));
   drawString(150, 20, dateS);
 
   String ampm = "am";
@@ -295,7 +262,7 @@ void drawTime() {
     ampm = "pm";
   }
   String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
-  drawString(150, 40, timeS);
+  drawString(150, 40, timeS);*/
 }
 
 // draws current weather information -- which is just the current temperature
@@ -374,63 +341,3 @@ void drawAstronomy() {
 
 }
 
-time_t getNtpTime() {
-  IPAddress ntpServerIP; // NTP server's ip address
-
-  while (Udp.parsePacket() > 0) {
-    Udp.read(packetBuffer, NTP_PACKET_SIZE); // discard any previously received packets, I made this change not sure if needed though
-  }
-  Serial.print("Transmit NTP Request ");
-  // get a random server from the pool
-  WiFi.hostByName(ntpServerName, ntpServerIP);
-  Serial.print(ntpServerName);
-  Serial.print(": ");
-  Serial.println(ntpServerIP);
-  sendNTPpacket(ntpServerIP);
-  uint32_t beginWait = millis();
-  while (millis() - beginWait < 1500) { // Extending wait from 1500 to 2-3k seemed to avoid the sync problem, but now it doesn't help
-    int size = Udp.parsePacket();
-    if (size >= NTP_PACKET_SIZE) {
-      Serial.println("Receive NTP Response");
-      Udp.read(packetBuffer, NTP_PACKET_SIZE);  // read packet into the buffer
-      unsigned long secsSince1900;
-      // convert four bytes starting at location 40 to a long integer
-      secsSince1900 =  (unsigned long)packetBuffer[40] << 24;
-      secsSince1900 |= (unsigned long)packetBuffer[41] << 16;
-      secsSince1900 |= (unsigned long)packetBuffer[42] << 8;
-      secsSince1900 |= (unsigned long)packetBuffer[43];
-      if (!ntpSuccess) {
-        ntpSuccess = true;
-      }
-      return secsSince1900 - 2208988800UL + timeZone * SECS_PER_HOUR;   // This is in time_t format
-    }
-  }
-  Serial.println("No NTP Response");
-  if (ntpSuccess) {
-    ntpSuccess = false;
-  }
-  return 0; // return 0 if unable to get the time
-}
-
-// send an NTP request to the time server at the given address
-void sendNTPpacket(IPAddress &address) {
-  int result;
-  // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE);
-  // Initialize values needed to form NTP request
-  // (see URL above for details on the packets)
-  packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-  packetBuffer[1] = 0;     // Stratum, or type of clock
-  packetBuffer[2] = 6;     // Polling Interval
-  packetBuffer[3] = 0xEC;  // Peer Clock Precision
-  // 8 bytes of zero for Root Delay & Root Dispersion
-  packetBuffer[12] = 49;
-  packetBuffer[13] = 0x4E;
-  packetBuffer[14] = 49;
-  packetBuffer[15] = 52;
-  // all NTP fields have been given values, now
-  // you can send a packet requesting a timestamp:
-  result = Udp.beginPacket(address, 123); //NTP requests are to port 123
-  result = Udp.write(packetBuffer, NTP_PACKET_SIZE);
-  result = Udp.endPacket();
-}

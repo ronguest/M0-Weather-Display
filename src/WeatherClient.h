@@ -33,6 +33,7 @@ class WeatherClient: public JsonListener {
     WeatherClient(boolean foo);
     void updateConditions(String device, String appKey, String apiKey);
     void updateForecast(String postalKey, String apiKey);
+    void init();
 
     String getMoonAge();
     String getSunriseTime();

@@ -3,9 +3,37 @@
 //
 
 #include <WiFi101.h>
+#include <WiFiUDP.h>
 #include "WeatherClient.h"
+//#include "credentials.h"
+#include <TimeLib.h>
+#include <Timezone.h>
+
+char nssid[] = "Extremely Awesome";     //  your network SSID (name)
+char npass[] = "pepsan00";    // your network password (use for WPA, or use as key for WEP)
 
 WeatherClient::WeatherClient(boolean foo) {
+
+}
+
+void WeatherClient::init() {
+  int status;
+  //Configure pins for Adafruit M0 ATWINC1500 Feather
+  WiFi.setPins(8,7,4,2);
+
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println(F("No Wifi"));
+    // don't continue
+    while (true) delay(1000);
+  }
+
+    while (status != WL_CONNECTED) {
+    Serial.print(F("Wifi connect to: ")); Serial.println(nssid);
+    status = WiFi.begin(nssid, npass);
+    // wait 10 seconds for connection
+    delay(5000);
+  }
 }
 
 void WeatherClient::updateConditions(String device, String appKey, String apiKey) {
