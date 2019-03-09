@@ -245,7 +245,7 @@ void WeatherClient::endObject() {
 String WeatherClient::getMeteoconIcon(int iconCode) {
   switch (iconCode) {
   case 0:
-    return "hazy";      // this is really a tornado
+    return "tstorms";      // this is really a tornado
   case 3:
     return "tstorms";
   case 4:

@@ -42,7 +42,7 @@ long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initia
 void setup(void) {
   time_t ntpTime;
   Serial.begin(115200);
-  delay(1000);
+  delay(2000);
 
   //Configure pins for Adafruit M0 ATWINC1500 Feather
   WiFi.setPins(8,7,4,2);
@@ -148,6 +148,9 @@ void updateData() {
 // Makes calls to paint the first screen
 void showOverview() {
   tft.fillScreen(WX_BLACK);
+  tft.setFont(&smallFont);
+Serial.println("Show overview");
+ui.drawString(120, 160, F("Draw overview"));
 
   drawTime();
   drawCurrentWeather();

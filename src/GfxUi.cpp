@@ -201,8 +201,8 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
             b = sdbuffer[buffidx++];
             g = sdbuffer[buffidx++];
             r = sdbuffer[buffidx++];
-            //_tft->pushColor(_tft->color565(r,g,b));
-            _tft->writePixel(_tft->color565(r,g,b));
+            _tft->pushColor(_tft->color565(r,g,b));
+            //_tft->writePixel(_tft->color565(r,g,b));
           } // end pixel
         } // end scanline
         _tft->endWrite();
