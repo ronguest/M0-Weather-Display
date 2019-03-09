@@ -155,10 +155,10 @@ String WeatherClient::getTomorrowForecastHigh() {
   return forecastHighTemp[1];
 }
 String WeatherClient::getTodayForecastLow() {
-  return forecastHighTemp[0];
+  return forecastLowTemp[0];
 }
 String WeatherClient::getTomorrowForecastLow() {
-  return forecastHighTemp[1];
+  return forecastLowTemp[1];
 }
 
 // Forecast text getters
@@ -238,7 +238,7 @@ void WeatherClient::endObject() {
 String WeatherClient::getMeteoconIcon(int iconCode) {
   switch (iconCode) {
   case 0:
-    return "tstorms";      // this is really a tornado
+    return "hazy";      // this is really a tornado
   case 3:
     return "tstorms";
   case 4:
