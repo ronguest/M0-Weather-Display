@@ -148,9 +148,6 @@ void updateData() {
 // Makes calls to paint the first screen
 void showOverview() {
   tft.fillScreen(WX_BLACK);
-  tft.setFont(&smallFont);
-Serial.println("Show overview");
-ui.drawString(120, 160, F("Draw overview"));
 
   drawTime();
   drawCurrentWeather();
