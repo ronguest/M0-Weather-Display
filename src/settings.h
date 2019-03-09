@@ -10,8 +10,12 @@
 #include <WiFi101.h>
 #include <WiFiUDP.h>
 #include <Adafruit_GFX.h>    // Core graphics library
+#ifdef ILI9341
 #include <Adafruit_ILI9341.h> // Hardware-specific library
+#endif
+#ifdef HX8357
 #include <Adafruit_HX8357.h>
+#endif
 #include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
