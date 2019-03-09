@@ -5,8 +5,6 @@
 #include <WiFi101.h>
 #include "WeatherClient.h"
 
-File myFile;
-
 WeatherClient::WeatherClient(boolean foo) {
 }
 

@@ -9,13 +9,6 @@
 #include <Wire.h>      // this is needed even tho we aren't using it
 #include <WiFi101.h>
 #include <WiFiUDP.h>
-#include <Adafruit_GFX.h>    // Core graphics library
-#ifdef ILI9341
-#include <Adafruit_ILI9341.h> // Hardware-specific library
-#endif
-#ifdef HX8357
-#include <Adafruit_HX8357.h>
-#endif
 #include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
@@ -23,26 +16,6 @@
 #include <Timezone.h>
 #include "credentials.h"
 #include "WeatherClient.h"
-
-#ifdef HX8357
-#include "Fonts/FreeSansBold9pt7b.h"    // Font from Adafruit Gfx library
-#include "ArialRoundedMTBold_36.h"    // Font created by http://oleddisplay.squix.ch/
-#define smallFont FreeSansBold9pt7b
-#define largeFont ArialRoundedMTBold_36
-const int maxPerLine = 34;    // Max chars that fit on line for text forecast info
-const int lineSize = 22;            // Vertical line space increment for forecast text
-#endif
-#ifdef ILI9341
-#include "ArialRoundedMTBold_14.h"    // Font created by http://oleddisplay.squix.ch/
-#include "ArialRoundedMTBold_36.h"    // Font created by http://oleddisplay.squix.ch/
-#define smallFont ArialRoundedMTBold_14
-#define largeFont ArialRoundedMTBold_36
-const int maxPerLine = 38;     // Max chars that fit on line for text forecast info
-const int lineSize = 20;            // Vertical line space increment for forecast text
-#endif
-
-// Additional UI functions
-#include "GfxUi.h"
 
 // Red LED output on the M0 Feather
 const int ledPin = 13;
@@ -61,18 +34,6 @@ const int ledPin = 13;
 
 #define PENRADIUS 3
 
-// The SPI pins of the WINC1500 (SCK, MOSI, MISO) should be
-// connected to the hardware SPI port of the Arduino.
-// On an Uno or compatible these are SCK = #13, MISO = #12, MOSI = #11.
-// On an Arduino Zero use the 6-pin ICSP header, see:
-//   https://www.arduino.cc/en/Reference/SPI
-
-// Or just use hardware SPI (SCK/MOSI/MISO) and defaults, SS -> #10, INT -> #7, RST -> #5, EN -> 3-5V
-//Adafruit_WINC1500 WiFi;
-
-//Adafruit_WINC1500Client client;
-
-int keyIndex = 0;                // your network key Index number (needed only for WEP)
 int status = WL_IDLE_STATUS;
 
 // NTP Servers:
@@ -95,7 +56,6 @@ unsigned int minutes = 0;                    // Track minutes
 unsigned int seconds = 0;                    // Track seconds
 unsigned int dayOfWeek = 0;                  // Sunday == 1
 
-WiFiUDP Udp;
 unsigned int localPort = 8888;  // local port to listen for UDP packets
 time_t getNtpTime();
 void sendNTPpacket(IPAddress &address);

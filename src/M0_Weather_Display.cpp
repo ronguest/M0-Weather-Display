@@ -14,8 +14,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 #endif
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
-GfxUi ui = GfxUi(&tft);
-
+WiFiUDP Udp;
 WeatherClient weather(true);
 
 //declaring prototypes
@@ -39,40 +38,51 @@ void todayDetail(int baseline);
 
 long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
 
+ImageReturnCode stat; // Status from image-reading functions
+Adafruit_ImageReader reader;     // Class w/image-reading functions
+
+void drawString(int x, int y, String s) {
+  tft.setCursor(x, y);
+  tft.println(s);
+}
+void drawBmp(String filename, int x, int y) {
+  // Notice the 'reader' object performs this, with 'tft' as an argument.
+  Serial.print(F("Loading moon.bmp to screen..."));
+  stat = reader.drawBMP("/moon/22.bmp", tft, 0, 0);
+  reader.printStatus(stat);   // How'd we do?  
+}
 void setup(void) {
   time_t ntpTime;
   Serial.begin(115200);
-  delay(2000);
+  delay(5000);
 
-  //Configure pins for Adafruit M0 ATWINC1500 Feather
-  WiFi.setPins(8,7,4,2);
+  Serial.println("Starting up");
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
 
-  Serial.println("FeatherWing TFT");
-  if (!ts.begin()) {
-    Serial.println("Couldn't start touchscreen controller");
-    while (1);
-  }
-  Serial.println("Touchscreen started");
+  //Configure pins for Adafruit M0 ATWINC1500 Feather
+  WiFi.setPins(8,7,4,2);
+
+  // check for the presence of the shield:
+  /*if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println(F("No Wifi"));
+    // don't continue
+    while (true) delay(1000);
+  }*/
 
   tft.begin();
   tft.setRotation(2);
   tft.fillScreen(WX_BLACK);
   tft.setFont(&smallFont);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.setTextAlignment(CENTER);
-  ui.drawString(120, 160, F("Connecting to WiFi"));
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  //tft.setTextAlignment(CENTER);
 
-  yield();
-
-  // check for the presence of the shield:
-  if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println(F("No Wifi"));
-    // don't continue
-    while (true) delay(1000);
+  if (!ts.begin()) {
+    Serial.println("Couldn't start touchscreen controller");
+    while (1);
   }
+  Serial.println("Touchscreen started");
 
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) {
@@ -81,6 +91,11 @@ void setup(void) {
     // wait 10 seconds for connection
     delay(5000);
   }
+
+  delay(10000);
+  tft.fillScreen(WX_BLUE);
+  Serial.println("Stopping in Setup");
+  while (1) delay(1000);
 
   // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
@@ -104,13 +119,17 @@ void setup(void) {
 void loop() {
   // Check if we should update weather information
   if ((millis() - lastDownloadUpdate) > (1000 * UPDATE_INTERVAL_SECS)) {
+    Serial.println("In update code");
     // Always display overview after an update
     showForecastText = false;
-    updateData();
+    updateData();                   // This calls showOverview when done
+    drawString(10,10,"Updating...");
     lastDownloadUpdate = millis();
   }
   // If user touches screen, toggle between weather overview and the detailed forecast text
   if (ts.touched()) {
+    Serial.println("Screen touched");
+    drawString(10,10,"Touhed...");
     showForecastText = !showForecastText;
     if (showForecastText) {
       showForecastDetail();
@@ -179,8 +198,8 @@ int drawForecastText(int y, String text, int maxLines) {
   int startPoint = 0;   // Position in text of next character to print
 
   tft.setFont(&smallFont);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.setTextAlignment(LEFT);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  //ui.setTextAlignment(LEFT);
   textLength = text.length();
 
   while ((startPoint < textLength) && (maxLines > 0)) {
@@ -195,7 +214,7 @@ int drawForecastText(int y, String text, int maxLines) {
     if (text.indexOf(' ', startPoint) == startPoint) {
       startPoint++;
     }
-    ui.drawString(10, y, text.substring(startPoint, finalSpace));
+    drawString(10, y, text.substring(startPoint, finalSpace));
     y += lineSize;
     startPoint = finalSpace;
     //Serial.print("Start point: ");Serial.println(startPoint);
@@ -214,8 +233,8 @@ void showForecastDetail() {
 
   tft.fillScreen(WX_BLACK);
   tft.setFont(&smallFont);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.setTextAlignment(LEFT);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  //ui.setTextAlignment(LEFT);
 
   // We show up to 4 periods which is 2 days + 2 nights
   for (period=0; period<4; period++) {
@@ -249,7 +268,7 @@ void showForecastDetail() {
     if ((period == 1 || period == 3)) {
       title = title + " " + "night";
     }
-    ui.drawString(0, y, title);
+    drawString(0, y, title);
     y += lineSize;
     y = drawForecastText(y, text, maxLines);
     y += lineSize;    // Add extra space between forecasts
@@ -263,12 +282,12 @@ void drawTime() {
   minutes = minute(local);
   dayOfWeek = weekday(local);
 
-  ui.setTextAlignment(CENTER);
-  ui.setTextColor(WX_WHITE, WX_BLACK);
+  //ui.setTextAlignment(CENTER);
+  tft.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);
 
   String dateS = String(dayStr(dayOfWeek)) + ", " + String(monthStr(month(local))) + " " + String(day(local));
-  ui.drawString(150, 20, dateS);
+  drawString(150, 20, dateS);
 
   String ampm = "am";
   if (hours >= 12) {
@@ -276,19 +295,19 @@ void drawTime() {
     ampm = "pm";
   }
   String timeS = String(hours) + ":" + (minutes < 10 ?"0" : "" ) + String(minutes) + ampm;
-  ui.drawString(150, 40, timeS);
+  drawString(150, 40, timeS);
 }
 
 // draws current weather information -- which is just the current temperature
 void drawCurrentWeather() {
   tft.setFont(&largeFont);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.setTextAlignment(RIGHT);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  //ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
   float f = weather.getCurrentTemp().toFloat();
   f = f + 0.5f;
   int temp = (int) f;
-  ui.drawString(180, 100, String(f).substring(0,2) + degreeSign);
+  drawString(180, 100, String(f).substring(0,2) + degreeSign);
 }
 
 // On first page draw hi, lo and icon for today and tomorrow
@@ -308,23 +327,23 @@ void drawForecast() {
 
 // helper for the forecast columns
 void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String high, String icon) {
-  ui.setTextColor(WX_CYAN, WX_BLACK);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
   tft.setFont(&smallFont);
-  ui.setTextAlignment(CENTER);
+  //ui.setTextAlignment(CENTER);
   day = day.substring(0, 3);
   day.toUpperCase();
-  ui.drawString(x + 45, y, day);
+  drawString(x + 45, y, day);
 
   tft.setFont(&largeFont);
-  ui.setTextColor(WX_WHITE, WX_BLACK);
+  tft.setTextColor(WX_WHITE, WX_BLACK);
   if (high == "null") {
     // Omit daytime high if null from WU
-    ui.drawString(x + 40, y + 40, low);
+    drawString(x + 40, y + 40, low);
   } else {
-    ui.drawString(x + 40, y + 40, low + "|" + high);
+    drawString(x + 40, y + 40, low + "|" + high);
   }
 
-  ui.drawBmp("/Icons/" + icon + ".bmp", x+0, y + 40);
+  drawBmp("/Icons/" + icon + ".bmp", x+0, y + 40);
 }
 
 // draw moonphase and sunrise/set and moonrise/set
@@ -335,23 +354,23 @@ void drawAstronomy() {
 
   moonFile = "/Moon/" + weather.getMoonAge() + ".bmp";
   Serial.println("Load moon file: " + moonFile);
-  ui.drawBmp(moonFile, 140, baseline+5);
+  drawBmp(moonFile, 140, baseline+5);
 
-  ui.setTextColor(WX_WHITE, WX_BLACK);
+  tft.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);
-  ui.setTextAlignment(LEFT);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(baseX, baseline+25, "Sun");
-  ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX, baseline+43, weather.getSunriseTime());
-  ui.drawString(baseX, baseline+60, weather.getSunsetTime());
+  //ui.setTextAlignment(LEFT);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  drawString(baseX, baseline+25, "Sun");
+  tft.setTextColor(WX_WHITE, WX_BLACK);
+  drawString(baseX, baseline+43, weather.getSunriseTime());
+  drawString(baseX, baseline+60, weather.getSunsetTime());
 
-  ui.setTextAlignment(RIGHT);
-  ui.setTextColor(WX_CYAN, WX_BLACK);
-  ui.drawString(baseX+280, baseline+25, "Moon");
-  ui.setTextColor(WX_WHITE, WX_BLACK);
-  ui.drawString(baseX+280, baseline+43, weather.getMoonriseTime());
-  ui.drawString(baseX+280, baseline+60, weather.getMoonsetTime());
+  //ui.setTextAlignment(RIGHT);
+  tft.setTextColor(WX_CYAN, WX_BLACK);
+  drawString(baseX+280, baseline+25, "Moon");
+  tft.setTextColor(WX_WHITE, WX_BLACK);
+  drawString(baseX+280, baseline+43, weather.getMoonriseTime());
+  drawString(baseX+280, baseline+60, weather.getMoonsetTime());
 
 }
 
