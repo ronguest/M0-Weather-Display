@@ -44,9 +44,9 @@ void drawString(int x, int y, String s) {
 }
 void drawBmp(String filename, int x, int y) {
   // Notice the 'reader' object performs this, with 'tft' as an argument.
-  Serial.print(F("Loading moon.bmp to screen..."));
+  /*Serial.print(F("Loading moon.bmp to screen..."));
   stat = reader.drawBMP("/moon/22.bmp", tft, 0, 0);
-  reader.printStatus(stat);   // How'd we do?  
+  reader.printStatus(stat);   // How'd we do? */ 
 }
 void setup(void) {
   time_t ntpTime;
@@ -80,10 +80,10 @@ void setup(void) {
   }
   Serial.println("SD OK!");
 
-  delay(5000);
+  /*delay(5000);
   tft.fillScreen(WX_BLUE);
   Serial.println("Stopping in Setup");
-  while (1) delay(1000);
+  while (1) delay(1000);*/
 
   currentHour = -1;     // Causes an immediate update to weather data on startup
 }
