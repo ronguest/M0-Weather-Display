@@ -5,8 +5,6 @@
 #include <WiFi101.h>
 #include "WeatherClient.h"
 
-File myFile;
-
 WeatherClient::WeatherClient(boolean foo) {
 }
 
@@ -32,9 +30,16 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   Serial.println("URL: " + url);
   digitalWrite(ledPin, HIGH);   // Turn on ledPin, it will stay on if we get an error
 
-  if (!client.connect(server, port)) {
-    Serial.println("connection failed");
-    return;
+  if (port == 443) {
+    if (!client.connectSSL(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
+  } else {
+    if (!client.connect(server, port)) {
+      Serial.println("connection failed");
+      return;
+    }
   }
 
   // This will send the request to the server
@@ -86,6 +91,7 @@ void WeatherClient::key(String key) {
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 void WeatherClient::value(String value) {
   if (currentKey == "tempf") {        // Only thing we take from Ambient Weather
+    Serial.println("Get tempf " + value);
     currentTemp = value;
   }
 
