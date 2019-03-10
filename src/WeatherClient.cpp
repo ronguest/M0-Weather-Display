@@ -116,6 +116,7 @@ void WeatherClient::value(String value) {
   }
 
   if (currentKey == "temperatureMax") {
+    Serial.println("tempMax "+ value);
     forecastHighTemp[currentForecastPeriod++] = value;
   }
   if (currentKey == "temperatureMin") {

@@ -5,13 +5,8 @@
 #include "display.h"
 #include "settings.h"
 
-#ifdef HX8357
 #define TFT_RST -1
 Adafruit_HX8357 tft = Adafruit_HX8357(TFT_CS, TFT_DC, TFT_RST);
-#endif
-#ifdef ILI9341
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-#endif
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 WeatherClient weather(true);
@@ -46,7 +41,7 @@ void drawBmp(String filename, int x, int y) {
   // Notice the 'reader' object performs this, with 'tft' as an argument.
   /*Serial.print(F("Loading moon.bmp to screen..."));
   stat = reader.drawBMP("/moon/22.bmp", tft, 0, 0);
-  reader.printStatus(stat);   // How'd we do? */ 
+  reader.printStatus(stat);   // How'd we do? */
 }
 void setup(void) {
   time_t ntpTime;
@@ -79,11 +74,6 @@ void setup(void) {
     Serial.println("SD failed!");
   }
   Serial.println("SD OK!");
-
-  /*delay(5000);
-  tft.fillScreen(WX_BLUE);
-  Serial.println("Stopping in Setup");
-  while (1) delay(1000);*/
 
   currentHour = -1;     // Causes an immediate update to weather data on startup
 }
