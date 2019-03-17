@@ -141,7 +141,11 @@ String WeatherClient::getCurrentTemp() {
 
 // Icon getters
 String WeatherClient::getTodayIcon() {
-  return getMeteoconIcon(forecastIcon[0]);
+	if (forecastIcon[0] == 0) {
+		return "null";
+	} else {
+		return getMeteoconIcon(forecastIcon[0]);
+	}
 }
 String WeatherClient::getTonightIcon() {
   return getMeteoconIcon(forecastIcon[1]);
@@ -306,9 +310,9 @@ String WeatherClient::getMeteoconIcon(int iconCode) {
   case 32:
     return "sunny";
   case 33:
-    return "pysunny";
+    return "psunny";
   case 34:
-    return "pysunny";
+    return "psunny";
   case 35:
     return "tstorms";
   case 36:

@@ -100,7 +100,7 @@ void sendNTPpacket(IPAddress &address);
 const int NTP_PACKET_SIZE = 48; // NTP time is in the first 48 bytes of message
 byte packetBuffer[NTP_PACKET_SIZE]; //buffer to hold incoming & outgoing packets
 
-const int UPDATE_INTERVAL_SECS = 10 * 60;  // Update Conditions every 10 minutes, others update once/hour
+const int UPDATE_INTERVAL_SECS = 5 * 60;  // Update Conditions every 5 minutes, others update once/hour
 //boolean USE_TOUCHSCREEN_WAKE = true;       // use the touchscreen to wake up, ~90mA current draw
 //boolean DEEP_SLEEP = false;                 // use the touchscreen for deep sleep, ~10mA current draw but doesnt work
 //int     AWAKE_TIME = 5;                   // how many seconds to stay 'awake' before going back to zzz
