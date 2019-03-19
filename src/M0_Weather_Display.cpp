@@ -15,6 +15,8 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 GfxUi ui = GfxUi(&tft);
+Adafruit_ImageReader reader;     // Class w/image-reading functions
+ImageReturnCode imageStatus; 	// Status from image-reading functions
 
 WeatherClient weather(true);
 
@@ -324,18 +326,25 @@ void drawForecastDetail(uint16_t x, uint16_t y, String day, String low, String h
     ui.drawString(x + 40, y + 40, low + "|" + high);
   }
 
-  ui.drawBmp("/Icons/" + icon + ".bmp", x+0, y + 40);
+  char file[64] = "/Icons/";
+  strcat(file, icon.c_str());
+  strcat(file, ".bmp");
+  Serial.print("Load icon file: "); Serial.println(file);
+  imageStatus = reader.drawBMP(file, tft, x+0, y + 40);
+  reader.printStatus(imageStatus);   // How'd we do?  
 }
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
   int baseline = 410;   // Place at the bottom
   int baseX = 20;
-  String moonFile;
 
-  moonFile = "/Moon/" + weather.getMoonAge() + ".bmp";
-  Serial.println("Load moon file: " + moonFile);
-  ui.drawBmp(moonFile, 140, baseline+5);
+  char file[64] = "/Moon/";
+  strcat(file, weather.getMoonAge().c_str());
+  strcat(file, ".bmp");
+  Serial.print("Load moon file: "); Serial.println(file);
+  imageStatus = reader.drawBMP(file, tft, 140, baseline+5);
+  reader.printStatus(imageStatus);   // How'd we do?  
 
   ui.setTextColor(WX_WHITE, WX_BLACK);
   tft.setFont(&smallFont);

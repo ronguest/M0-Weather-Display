@@ -52,7 +52,6 @@ class GfxUi {
     void setTextColor(uint16_t c);
     void setTextColor(uint16_t c, uint16_t bg);
     void setTextSize(uint16_t x);
-    void drawBmp(String filename, uint16_t x, uint16_t y);
 
   private:
   #ifdef HX8357
@@ -64,9 +63,6 @@ class GfxUi {
     TextAlignment _alignment = LEFT;
     uint16_t _textColor;
     uint16_t _backgroundColor;
-    uint16_t read16(File &f);
-    uint32_t read32(File &f);
-    int freeRam();
 };
 
 #endif
