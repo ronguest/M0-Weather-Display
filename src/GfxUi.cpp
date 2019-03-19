@@ -105,7 +105,7 @@ void GfxUi::drawBmp(String filename, uint16_t x, uint16_t y) {
   Serial.println('\'');*/
 
   // Open requested file on SD card
-  if ((bmpFile = SD.open(filename)) == NULL) {
+  if ((bmpFile = SD.open(filename.c_str())) == NULL) {
     Serial.print(F("File not found "));
     Serial.println(filename);
     return;
