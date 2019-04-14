@@ -8,15 +8,15 @@
 WeatherClient::WeatherClient(boolean foo) {
 }
 
-void WeatherClient::updateConditions(String device, String appKey, String apiKey) {
-  doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+boolean WeatherClient::updateConditions(String device, String appKey, String apiKey) {
+  return doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
 }
 
-void WeatherClient::updateForecast(String postalKey, String apiKey) {
-  doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
+boolean WeatherClient::updateForecast(String postalKey, String apiKey) {
+  return doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
-void WeatherClient::doUpdate(int port, char server[], String url) {
+boolean WeatherClient::doUpdate(int port, char server[], String url) {
   JsonStreamingParser parser;
   // It might be better to have separate objects for each weather data source
   // As it is now the same code is processing keywords from diverse sources leading to potential conflictss
@@ -33,12 +33,12 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   if (port == 443) {
     if (!client.connectSSL(server, port)) {
       Serial.println("connection failed");
-      return;
+      return false;
     }
   } else {
     if (!client.connect(server, port)) {
       Serial.println("connection failed");
-      return;
+      return false;
     }
   }
 
@@ -54,7 +54,7 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
     retryCounter++;
     if (retryCounter > 15) {
       Serial.println(F("Retry timed out"));
-      return;
+      return false;
     }
   }
 
@@ -76,6 +76,7 @@ void WeatherClient::doUpdate(int port, char server[], String url) {
   client.stop();          // We're done, shut down the connection
 
   digitalWrite(ledPin, LOW);    // Turn LED off to show we're done
+  return true;
 }
 
 // The key basically tells us which set of data from the JSON is coming

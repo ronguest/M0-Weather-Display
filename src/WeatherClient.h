@@ -27,12 +27,12 @@ class WeatherClient: public JsonListener {
     String sunsetTime[MAX_FORECAST_PERIODS];            // WU provides 1 per calendar day
     String moonriseTime[MAX_FORECAST_PERIODS];          // WU provides 1 per calendar day
     String moonsetTime[MAX_FORECAST_PERIODS];           // WU provides 1 per calendar day
-    void doUpdate(int port, char server[], String url);
+    boolean doUpdate(int port, char server[], String url);
 
   public:
     WeatherClient(boolean foo);
-    void updateConditions(String device, String appKey, String apiKey);
-    void updateForecast(String postalKey, String apiKey);
+    boolean updateConditions(String device, String appKey, String apiKey);
+    boolean updateForecast(String postalKey, String apiKey);
 
     String getMoonAge();
     String getSunriseTime();

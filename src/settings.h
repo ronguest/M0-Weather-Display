@@ -43,6 +43,8 @@ const int lineSize = 20;            // Vertical line space increment for forecas
 
 // Red LED output on the M0 Feather
 const int ledPin = 13;
+int circleX = 312;
+int circleY = 5;
 
 // Configure TFT pins - specific to M0
 #define STMPE_CS 6

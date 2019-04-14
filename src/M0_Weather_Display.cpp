@@ -25,7 +25,7 @@ void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTot
 typedef void (*ProgressCallback)(String fileName, int16_t bytesDownloaded, int16_t bytesTotal);
 ProgressCallback _downloadCallback = downloadCallback;
 void downloadResources();
-void updateData();
+boolean updateData();
 void showOverview();
 void showForecastDetail();
 int drawForecastText(int y, String text, int maxlines);
@@ -40,6 +40,7 @@ void sendNTPpacket(IPAddress&);
 void todayDetail(int baseline);
 
 long lastDownloadUpdate = -(1000L * UPDATE_INTERVAL_SECS)-1;    // Forces initial screen draw
+boolean updateSuccess;
 
 void setup(void) {
   time_t ntpTime;
@@ -110,6 +111,11 @@ void loop() {
     showForecastText = false;
     updateData();
     lastDownloadUpdate = millis();
+	if (updateSuccess) {
+		tft.fillCircle(circleX, circleY, 5, HX8357_GREEN);
+	} else {
+		tft.fillCircle(circleX, circleY, 5, HX8357_RED);
+	}		
   }
   // If user touches screen, toggle between weather overview and the detailed forecast text
   if (ts.touched()) {
@@ -119,32 +125,39 @@ void loop() {
     } else {
       showOverview();
     }
+	if (updateSuccess) {
+		tft.fillCircle(circleX, circleY, 5, HX8357_GREEN);
+	} else {
+		tft.fillCircle(circleX, circleY, 5, HX8357_RED);
+	}	
   }
   delay(100);
 }
 
 // Download latest weather data and update screen
-void updateData() {
-  time_t local;
-  time_t ntpTime;
-  int thisHour;
+boolean updateData() {
+	time_t local;
+	time_t ntpTime;
+	int thisHour;
+	boolean success1 = true;
+	boolean success2 = true;
 
-  local = usCT.toLocal(now(), &tcr);
-  thisHour = hour(local);
+	local = usCT.toLocal(now(), &tcr);
+	thisHour = hour(local);
 
-  weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
-  // We only update the Forecast once an hour. They don't change much
-  if (thisHour != currentHour) {
-    currentHour = thisHour;
-    weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
-    // Try an NTP time sync so we don't get too far off
-    ntpTime = getNtpTime();
-    if (ntpTime != 0) {
-      setTime(ntpTime);
-    }
-  }
-
-  showOverview();
+	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
+	// We only update the Forecast once an hour. They don't change much
+	if (thisHour != currentHour) {
+		currentHour = thisHour;
+		success2 = weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
+		// Try an NTP time sync so we don't get too far off
+		ntpTime = getNtpTime();
+		if (ntpTime != 0) {
+			setTime(ntpTime);
+		}
+	}
+	updateSuccess = success1 & success2;
+	showOverview();
 }
 
 // Makes calls to paint the first screen
