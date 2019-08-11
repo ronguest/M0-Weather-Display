@@ -304,7 +304,8 @@ void drawCurrentWeather() {
   float f = weather.getCurrentTemp().toFloat();
   f = f + 0.5f;
   int temp = (int) f;
-  ui.drawString(180, 100, String(f).substring(0,2) + degreeSign);
+  ui.drawString(180, 100, temp + degreeSign);
+  //ui.drawString(180, 100, String(f).substring(0,2) + degreeSign);
 }
 
 // On first page draw hi, lo and icon for today and tomorrow
