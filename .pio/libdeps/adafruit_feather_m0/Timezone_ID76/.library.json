@@ -1,0 +1,39 @@
+{
+    "name": "Timezone", 
+    "version": "1.2.2", 
+    "keywords": [
+        "timing"
+    ], 
+    "description": "Arduino library to facilitate time zone conversions and automatic daylight saving (summer) time adjustments.", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "platforms": [
+        "atmelavr"
+    ], 
+    "authors": [
+        {
+            "email": "jack.christensen@outlook.com", 
+            "url": null, 
+            "maintainer": true, 
+            "name": "Jack Christensen"
+        }
+    ], 
+    "repository": {
+        "type": "git", 
+        "url": "https://github.com/JChristensen/Timezone"
+    }, 
+    "homepage": null, 
+    "export": {
+        "include": null, 
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ]
+    }, 
+    "id": 76
+}

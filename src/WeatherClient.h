@@ -6,8 +6,6 @@
 
 #include <JsonListener.h>
 #include <JsonStreamingParser.h>
-#include <SPI.h>
-#include <SD.h>
 
 #define MAX_FORECAST_PERIODS 24  // Changed from 7 to 12 to support 6 day / 2 screen forecast (Neptune)
 

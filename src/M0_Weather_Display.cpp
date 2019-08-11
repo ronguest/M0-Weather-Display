@@ -15,7 +15,8 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);
 
 GfxUi ui = GfxUi(&tft);
-Adafruit_ImageReader reader;     // Class w/image-reading functions
+SdFat                SD;         // SD card filesystem
+Adafruit_ImageReader reader(SD); // Image-reader object, pass in SD filesys
 ImageReturnCode imageStatus; 	// Status from image-reading functions
 
 WeatherClient weather(true);
@@ -87,7 +88,7 @@ void setup(void) {
 
   // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
-  if (!SD.begin(SD_CS)) {
+  if (!SD.begin(SD_CS), SD_SCK_MHZ(25))) {
     Serial.println("SD failed!");
   }
   Serial.println("SD OK!");

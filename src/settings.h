@@ -5,15 +5,16 @@
 #pragma once
 
 #include <Arduino.h>
-#include <SPI.h>
+//#include <SPI.h>
 #include <Wire.h>      // this is needed even tho we aren't using it
 #include <WiFi101.h>
 #include <WiFiUDP.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 //#include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <Adafruit_HX8357.h>
+#include <SdFat.h>                // SD card & FAT filesystem library
+#include <Adafruit_SPIFlash.h>    // SPI / QSPI flash library
 #include <Adafruit_ImageReader.h>
-#include <SD.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
 #include <TimeLib.h>
