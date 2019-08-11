@@ -17,8 +17,9 @@
 #include <Adafruit_ImageReader.h>
 #include <Adafruit_STMPE610.h>
 #include <JsonListener.h>
-#include <TimeLib.h>
-#include <Timezone.h>
+#include <string.h>
+#include "TimeLib.h"
+#include "Timezone.h"
 #include "credentials.h"
 #include "WeatherClient.h"
 

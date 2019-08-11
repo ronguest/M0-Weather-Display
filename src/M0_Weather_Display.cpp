@@ -88,7 +88,7 @@ void setup(void) {
 
   // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
-  if (!SD.begin(SD_CS), SD_SCK_MHZ(25))) {
+  if (!SD.begin(SD_CS, SD_SCK_MHZ(25))) {
     Serial.println("SD failed!");
   }
   Serial.println("SD OK!");

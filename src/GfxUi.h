@@ -20,7 +20,7 @@ See more at http://blog.squix.ch
 
 #include "display.h"
 #include <Adafruit_GFX.h>
-#include <SD.h>
+//#include <SD.h>
 #ifdef HX8357
 #include <Adafruit_HX8357.h>
 #endif
