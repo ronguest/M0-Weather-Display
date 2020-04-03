@@ -146,7 +146,8 @@ boolean updateData() {
 	local = usCT.toLocal(now(), &tcr);
 	thisHour = hour(local);
 
-	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
+//	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
+	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, WUNDERGRROUND_API_KEY);
 	// We only update the Forecast once an hour. They don't change much
 	if (thisHour != currentHour) {
 		currentHour = thisHour;

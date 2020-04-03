@@ -9,7 +9,8 @@ WeatherClient::WeatherClient(boolean foo) {
 }
 
 boolean WeatherClient::updateConditions(String device, String appKey, String apiKey) {
-  return doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+//  return doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
+  return doUpdate(80, "api.weather.com", "/v2/pws/observations/current?stationId=KTXALLEN99&format=json&units=e&apiKey=" + apiKey);
 }
 
 boolean WeatherClient::updateForecast(String postalKey, String apiKey) {
@@ -91,8 +92,8 @@ void WeatherClient::key(String key) {
 // If a value = "null" for several of the below we ignore those due to how the Wunderground feed works
 // Should only be null afer 3pm which is an arbitrary cut off by WU ?
 void WeatherClient::value(String value) {
-  if (currentKey == "tempf") {        // Only thing we take from Ambient Weather
-    Serial.println("Get tempf " + value);
+  if (currentKey == "temp") {        // Only thing we take from Ambient Weather
+    Serial.println("Get temp " + value);
     currentTemp = value;
   }
 
