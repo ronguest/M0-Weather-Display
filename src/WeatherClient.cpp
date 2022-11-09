@@ -10,11 +10,11 @@ WeatherClient::WeatherClient(boolean foo) {
 
 boolean WeatherClient::updateConditions(String device, String appKey, String apiKey) {
 //  return doUpdate(443, "api.ambientweather.net", "/v1/devices/" + device + "?applicationKey=" + appKey + "&apiKey=" + apiKey + "&limit=1");
-  return doUpdate(80, "api.weather.com", "/v2/pws/observations/current?stationId=KTXALLEN99&format=json&units=e&apiKey=" + apiKey);
+  return doUpdate(443, "api.weather.com", "/v2/pws/observations/current?stationId=KTXALLEN99&format=json&units=e&apiKey=" + apiKey);
 }
 
 boolean WeatherClient::updateForecast(String postalKey, String apiKey) {
-  return doUpdate(80, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
+  return doUpdate(443, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
 }
 
 boolean WeatherClient::doUpdate(int port, char server[], String url) {

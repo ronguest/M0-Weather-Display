@@ -26,7 +26,7 @@ void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTot
 typedef void (*ProgressCallback)(String fileName, int16_t bytesDownloaded, int16_t bytesTotal);
 ProgressCallback _downloadCallback = downloadCallback;
 void downloadResources();
-boolean updateData();
+void updateData();
 void showOverview();
 void showForecastDetail();
 int drawForecastText(int y, String text, int maxlines);
@@ -107,11 +107,15 @@ void setup(void) {
 
 void loop() {
   // Check if we should update weather information
-  if ((millis() - lastDownloadUpdate) > (1000 * UPDATE_INTERVAL_SECS)) {
+  if ((millis() - lastDownloadUpdate) > (1000L * UPDATE_INTERVAL_SECS)) {
+    Serial.println("millis " + String(millis()));
+    Serial.println("lastDownload " + String(lastDownloadUpdate));
     // Always display overview after an update
     showForecastText = false;
     updateData();
     lastDownloadUpdate = millis();
+    Serial.println("updated lastDownload " + String(lastDownloadUpdate));
+
 	if (updateSuccess) {
 		tft.fillCircle(circleX, circleY, 5, HX8357_GREEN);
 	} else {
@@ -136,7 +140,7 @@ void loop() {
 }
 
 // Download latest weather data and update screen
-boolean updateData() {
+void updateData() {
 	time_t local;
 	time_t ntpTime;
 	int thisHour;
@@ -149,6 +153,7 @@ boolean updateData() {
 //	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, AW_API_KEY);
 	success1 = weather.updateConditions(AW_DEVICE, AW_APP_KEY, WUNDERGRROUND_API_KEY);
 	// We only update the Forecast once an hour. They don't change much
+  //return;
 	if (thisHour != currentHour) {
 		currentHour = thisHour;
 		success2 = weather.updateForecast(WUNDERGROUND_POSTAL_KEY, WUNDERGRROUND_API_KEY);
