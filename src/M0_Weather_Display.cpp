@@ -88,10 +88,11 @@ void setup(void) {
 
   // Set up SD card to read icons/moon files
   Serial.print("Initializing SD card...");
-  if (!SD.begin(SD_CS, SD_SCK_MHZ(25))) {
-    Serial.println("SD failed!");
+  if (!SD.begin(SD_CS, SD_SCK_MHZ(12))) {
+    Serial.println("SD failed! ***");
+  } else {
+    Serial.println("SD OK!");
   }
-  Serial.println("SD OK!");
 
   // Get current time using NTP
   Udp.begin(localPort);
