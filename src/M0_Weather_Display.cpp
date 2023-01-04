@@ -57,9 +57,10 @@ void setup(void) {
   Serial.println("FeatherWing TFT");
   if (!ts.begin()) {
     Serial.println("Couldn't start touchscreen controller");
-    while (1);
+    // while (1);
+  } else {
+    Serial.println("Touchscreen started");
   }
-  Serial.println("Touchscreen started");
 
   tft.begin();
   tft.setRotation(2);
