@@ -16,7 +16,7 @@ boolean WeatherClient::updateConditions(String device, String appKey, String api
 
 boolean WeatherClient::updateForecast(String postalKey, String apiKey) {
 //  return doUpdate(443, "api.weather.com", "/v3/wx/forecast/daily/5day?postalKey=" + postalKey + "&units=e&language=en-US&format=json&apiKey=" + apiKey);
-  return doUpdate(80,"10.0.1.38",/forecast.json)
+  return doUpdate(80,"10.0.1.38", "/forecast.json");
 }
 
 boolean WeatherClient::doUpdate(int port, char server[], String url) {
